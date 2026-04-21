@@ -25,7 +25,6 @@
             margin: 0 auto;
         }
         
-        /* 头部 */
         .header {
             text-align: center;
             padding: 30px 0;
@@ -44,7 +43,6 @@
             font-size: 14px;
         }
         
-        /* 连接钱包 */
         .wallet-section {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 16px;
@@ -86,7 +84,6 @@
             margin-top: 12px;
         }
         
-        /* 统计卡片 */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -116,7 +113,6 @@
             letter-spacing: 1px;
         }
         
-        /* 上下级关系区域 */
         .relations-section {
             display: grid;
             grid-template-columns: 1fr 2fr;
@@ -130,7 +126,6 @@
             }
         }
         
-        /* 上级卡片 */
         .parent-card {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 16px;
@@ -138,7 +133,6 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        /* 绑定上级 */
         .bind-section {
             margin-top: 16px;
         }
@@ -232,7 +226,6 @@
             color: #8892b0;
         }
         
-        /* 下级列表 */
         .children-card {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 16px;
@@ -312,7 +305,7 @@
         
         .child-details {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 12px;
             font-size: 12px;
         }
@@ -339,7 +332,28 @@
             color: #f44336;
         }
         
-        /* 推广链接 */
+        .claim-btn-small {
+            padding: 6px 16px;
+            background: linear-gradient(90deg, #ff6b6b 0%, #ffa500 100%);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .claim-btn-small:hover {
+            transform: scale(1.05);
+        }
+        
+        .claim-btn-small:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
         .referral-section {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 16px;
@@ -380,65 +394,34 @@
             background: #00b8d9;
         }
         
-        /* 一键领取 */
-        .claim-section {
-            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(255, 165, 89, 0.1) 100%);
+        .up-qualify-card {
+            background: linear-gradient(135deg, rgba(100, 255, 218, 0.1) 0%, rgba(0, 217, 255, 0.1) 100%);
             border-radius: 16px;
             padding: 24px;
             margin-bottom: 20px;
-            border: 1px solid rgba(255, 107, 107, 0.3);
+            border: 1px solid rgba(100, 255, 218, 0.3);
         }
         
-        .claim-info {
+        .qualify-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        .claim-amount {
-            font-size: 24px;
-            color: #ff6b6b;
-            font-weight: 700;
+        .qualify-item:last-child {
+            border-bottom: none;
         }
         
-        .claim-amount-label {
-            font-size: 12px;
-            color: #8892b0;
+        .qualify-label {
+            color: #ccd6f6;
         }
         
-        .claim-btn {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(90deg, #ff6b6b 0%, #ffa500 100%);
-            border: none;
-            border-radius: 12px;
-            color: #fff;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+        .qualify-status {
+            font-weight: 600;
         }
         
-        .claim-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
-        }
-        
-        .claim-btn:disabled {
-            background: #555;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-            text-transform: none;
-            letter-spacing: normal;
-        }
-        
-        /* 空状态 */
         .empty-state {
             text-align: center;
             padding: 40px;
@@ -450,7 +433,6 @@
             margin-bottom: 16px;
         }
         
-        /* 消息提示 */
         .message {
             position: fixed;
             top: 20px;
@@ -487,7 +469,6 @@
             }
         }
         
-        /* 加载动画 */
         .loading {
             display: inline-block;
             width: 20px;
@@ -504,12 +485,10 @@
             to { transform: rotate(360deg); }
         }
         
-        /* 隐藏 */
         .hidden {
             display: none !important;
         }
         
-        /* 滚动条 */
         .children-list::-webkit-scrollbar {
             width: 6px;
         }
@@ -523,11 +502,18 @@
             background: rgba(255,255,255,0.2);
             border-radius: 3px;
         }
+        
+        .phase-badge {
+            background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 头部 -->
         <div class="header">
             <h1>👥 推广关系管理</h1>
             <p>查看您的上下级关系，管理推广团队</p>
@@ -549,20 +535,28 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <div id="totalChildren" class="stat-value">0</div>
-                    <div class="stat-label">下级总数</div>
+                    <div class="stat-label">直接下级</div>
                 </div>
                 <div class="stat-card">
                     <div id="qualifiedChildren" class="stat-value">0</div>
-                    <div class="stat-label">达标下级</div>
+                    <div class="stat-label">已达标</div>
                 </div>
                 <div class="stat-card">
                     <div id="pendingChildren" class="stat-value">0</div>
                     <div class="stat-label">持仓中</div>
                 </div>
                 <div class="stat-card">
-                    <div id="teamBalance" class="stat-value">0</div>
-                    <div class="stat-label">团队总持仓</div>
+                    <div id="currentPhase" class="stat-value">-</div>
+                    <div class="stat-label">当前阶段</div>
                 </div>
+            </div>
+        </div>
+        
+        <!-- 上级资格状态 -->
+        <div id="upQualifyCard" class="up-qualify-card hidden">
+            <div class="section-title">📋 我的领取资格（上级条件）</div>
+            <div id="qualifyList">
+                <!-- 动态填充 -->
             </div>
         </div>
         
@@ -574,7 +568,6 @@
                 <div id="parentInfo" class="parent-info empty">
                     <p>暂无上级</p>
                 </div>
-                <!-- 绑定上级区域 -->
                 <div id="bindSection" class="bind-section hidden">
                     <div id="refFromUrl" class="ref-from-url hidden"></div>
                     <input type="text" id="bindAddressInput" class="bind-input" placeholder="输入上级钱包地址 (0x...)">
@@ -600,24 +593,6 @@
             </div>
         </div>
         
-        <!-- 一键领取奖励 -->
-        <div id="claimSection" class="claim-section hidden">
-            <div class="section-title">💰 推广奖励</div>
-            <div class="claim-info">
-                <div>
-                    <div class="claim-amount-label">可领取奖励（预估）</div>
-                    <div id="claimableAmount" class="claim-amount">0 代币</div>
-                </div>
-                <div style="text-align: right;">
-                    <div class="claim-amount-label">可领取人数</div>
-                    <div id="claimableCount2" style="font-size: 20px; color: #64ffda;">0 人</div>
-                </div>
-            </div>
-            <button id="claimBtn" class="claim-btn" onclick="claimAllRewards()">
-                🏆 一键领取所有奖励
-            </button>
-        </div>
-        
         <!-- 推广链接 -->
         <div id="referralSection" class="referral-section hidden">
             <div class="section-title">📢 我的推广链接</div>
@@ -625,28 +600,27 @@
                 <input type="text" id="referralLink" class="referral-input" readonly>
                 <button class="copy-btn" onclick="copyReferralLink()">复制链接</button>
             </div>
+            <p style="margin-top: 12px; font-size: 12px; color: #8892b0;">
+                💡 提示：下级必须先绑定此链接，再买入代币才能建立推广关系
+            </p>
         </div>
     </div>
 
     <script>
         // ==================== 配置 ====================
         const CONFIG = {
-            // 代币合约地址
-            TOKEN_ADDRESS: "0xA61C5419D661B1396c95c91b41C89eeFf5f79c68",
-            // BSC RPC
+            TOKEN_ADDRESS: "0xa61c5419d661b1396c95c91b41c89eeff5f79c68",
             BSC_RPC: "https://bsc-dataseed.binance.org/",
-            // 代币小数位
-            DECIMALS: 18
+            DECIMALS: 18,
+            HOLD_LOCK_PERIOD: 24 * 60 * 60
         };
         
-        // ==================== 全局变量 ====================
         let web3;
         let account;
         let contract;
         
         // ==================== ABI ====================
         const TOKEN_ABI = [
-            // 查看函数
             {
                 "inputs": [{"internalType": "address", "name": "", "type": "address"}],
                 "name": "referrer",
@@ -655,21 +629,28 @@
                 "type": "function"
             },
             {
-                "inputs": [],
-                "name": "getMyReferralsCount",
+                "inputs": [{"internalType": "address", "name": "", "type": "address"}],
+                "name": "referrerBindTime",
                 "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
                 "stateMutability": "view",
                 "type": "function"
             },
             {
-                "inputs": [],
-                "name": "getMyReferralList",
-                "outputs": [{"internalType": "address[]", "name": "", "type": "address[]"}],
+                "inputs": [{"internalType": "address", "name": "", "type": "address"}],
+                "name": "userFirstBuyTime",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
                 "stateMutability": "view",
                 "type": "function"
             },
             {
-                "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
+                "inputs": [{"internalType": "address", "name": "", "type": "address"}],
+                "name": "userBuyPhase",
+                "outputs": [{"internalType": "uint8", "name": "", "type": "uint8"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "", "type": "address"}],
                 "name": "balanceOf",
                 "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
                 "stateMutability": "view",
@@ -677,43 +658,13 @@
             },
             {
                 "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
-                "name": "getUserHoldInfo",
+                "name": "checkHoldQualified",
                 "outputs": [
-                    {"internalType": "uint256", "name": "currentThreshold", "type": "uint256"},
-                    {"internalType": "uint256", "name": "startTime", "type": "uint256"},
-                    {"internalType": "uint256", "name": "endTime", "type": "uint256"},
-                    {"internalType": "bool", "name": "qualified", "type": "bool"},
-                    {"internalType": "uint256", "name": "userBalance", "type": "uint256"}
+                    {"internalType": "bool", "name": "", "type": "bool"},
+                    {"internalType": "uint256", "name": "", "type": "uint256"},
+                    {"internalType": "uint256", "name": "", "type": "uint256"}
                 ],
                 "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
-                "name": "userFirstBuyTime",
-                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
-                "name": "referrerBindTime",
-                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "getClaimableReferralsCount",
-                "outputs": [{"internalType": "uint256", "name": "count", "type": "uint256"}],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "claimAllReferralRewards",
-                "outputs": [],
-                "stateMutability": "nonpayable",
                 "type": "function"
             },
             {
@@ -736,6 +687,57 @@
                 "outputs": [],
                 "stateMutability": "nonpayable",
                 "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
+                "name": "claimReward",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getCurrentPhase",
+                "outputs": [{"internalType": "uint8", "name": "", "type": "uint8"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "isRewardActive",
+                "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "PHASE1_USER_THRESHOLD",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "PHASE2_USER_THRESHOLD",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "PHASE3_USER_THRESHOLD",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {"indexed": true, "name": "user", "type": "address"},
+                    {"indexed": true, "name": "referrer", "type": "address"}
+                ],
+                "name": "ReferralBound",
+                "type": "event"
             }
         ];
         
@@ -761,6 +763,13 @@
             return date.toLocaleDateString('zh-CN') + ' ' + date.toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'});
         }
         
+        function formatTimeLeft(seconds) {
+            if (seconds <= 0) return '已达标';
+            const hours = Math.floor(seconds / 3600);
+            const mins = Math.floor((seconds % 3600) / 60);
+            return `${hours}小时${mins}分`;
+        }
+        
         function showMessage(text, type = 'success') {
             const oldMsg = document.querySelector('.message');
             if (oldMsg) oldMsg.remove();
@@ -770,7 +779,7 @@
             msg.textContent = text;
             document.body.appendChild(msg);
             
-            setTimeout(() => msg.remove(), 3000);
+            setTimeout(() => msg.remove(), 4000);
         }
         
         // ==================== 连接钱包 ====================
@@ -790,24 +799,21 @@
                 web3 = new Web3(window.ethereum);
                 contract = new web3.eth.Contract(TOKEN_ABI, CONFIG.TOKEN_ADDRESS);
                 
-                // 更新UI
                 document.getElementById('connectBtn').classList.add('hidden');
                 document.getElementById('walletInfo').style.display = 'block';
                 document.getElementById('walletAddress').textContent = account;
                 
-                // 显示功能区域
                 document.getElementById('statsSection').classList.remove('hidden');
                 document.getElementById('relationsSection').classList.remove('hidden');
-                document.getElementById('claimSection').classList.remove('hidden');
                 document.getElementById('referralSection').classList.remove('hidden');
+                document.getElementById('upQualifyCard').classList.remove('hidden');
                 
                 // 生成推广链接
-                const baseUrl = window.location.origin + window.location.pathname.replace('referral-dashboard.html', 'referral-new.html');
+                const baseUrl = window.location.origin + window.location.pathname;
                 document.getElementById('referralLink').value = `${baseUrl}?ref=${account}`;
                 
                 // 加载数据
-                await loadRelations();
-                await loadClaimableInfo();
+                await loadAllData();
                 
                 showMessage('钱包连接成功！');
                 
@@ -818,18 +824,31 @@
             }
         }
         
-        // ==================== 加载上下级关系 ====================
-        async function loadRelations() {
+        // ==================== 加载所有数据 ====================
+        async function loadAllData() {
+            await Promise.all([
+                loadParent(),
+                loadChildren(),
+                loadUpQualifyStatus(),
+                loadCurrentPhase()
+            ]);
+        }
+        
+        // 加载当前阶段
+        async function loadCurrentPhase() {
             try {
-                // 加载上级
-                await loadParent();
+                const phase = await contract.methods.getCurrentPhase().call();
+                const isActive = await contract.methods.isRewardActive().call();
                 
-                // 加载下级
-                await loadChildren();
+                let phaseText = '奖励已停止';
+                if (isActive) {
+                    phaseText = `第 ${phase} 阶段`;
+                }
+                
+                document.getElementById('currentPhase').innerHTML = `<span class="phase-badge">${phaseText}</span>`;
                 
             } catch (error) {
-                console.error('加载关系失败:', error);
-                showMessage('加载数据失败', 'error');
+                console.error('加载阶段失败:', error);
             }
         }
         
@@ -841,22 +860,17 @@
                 const bindSection = document.getElementById('bindSection');
                 
                 if (parent && parent !== '0x0000000000000000000000000000000000000000') {
-                    // 已绑定上级
-                    const balance = await contract.methods.balanceOf(parent).call();
-                    
                     parentInfo.classList.remove('empty');
+                    const balance = await contract.methods.balanceOf(parent).call();
                     parentInfo.innerHTML = `
-                        <div class="parent-address">${formatAddress(parent)}</div>
+                        <div class="parent-address">${parent}</div>
                         <div class="parent-balance">持仓: ${formatTokenAmount(balance)} 代币</div>
                     `;
                     bindSection.classList.add('hidden');
                 } else {
-                    // 未绑定上级，显示绑定区域
                     parentInfo.classList.add('empty');
                     parentInfo.innerHTML = '<p>暂无上级</p>';
                     bindSection.classList.remove('hidden');
-                    
-                    // 检查URL参数是否有推荐人
                     checkUrlReferrer();
                 }
             } catch (error) {
@@ -864,7 +878,6 @@
             }
         }
         
-        // 检查URL中的推荐人参数
         function checkUrlReferrer() {
             const urlParams = new URLSearchParams(window.location.search);
             const ref = urlParams.get('ref');
@@ -873,7 +886,7 @@
                 const refFromUrl = document.getElementById('refFromUrl');
                 const bindInput = document.getElementById('bindAddressInput');
                 
-                refFromUrl.textContent = `🔗 来自链接: ${formatAddress(ref)}`;
+                refFromUrl.textContent = `🔗 来自链接: ${ref}`;
                 refFromUrl.classList.remove('hidden');
                 bindInput.value = ref;
             }
@@ -885,13 +898,11 @@
             const input = document.getElementById('bindAddressInput');
             const referrerAddress = input.value.trim();
             
-            // 验证地址
             if (!referrerAddress || !referrerAddress.startsWith('0x') || referrerAddress.length !== 42) {
                 showMessage('请输入有效的钱包地址', 'error');
                 return;
             }
             
-            // 不能绑定自己
             if (referrerAddress.toLowerCase() === account.toLowerCase()) {
                 showMessage('不能绑定自己为上级', 'error');
                 return;
@@ -901,27 +912,22 @@
                 btn.disabled = true;
                 btn.innerHTML = '<span class="loading"></span>绑定中...';
                 
-                // 调用合约绑定
                 await contract.methods.bindReferrer(referrerAddress).send({
                     from: account,
-                    gas: 200000
+                    gas: 100000
                 });
                 
                 showMessage('🎉 绑定上级成功！');
-                
-                // 刷新上级显示
                 await loadParent();
                 
             } catch (error) {
                 console.error('绑定失败:', error);
                 if (error.message.includes('already bound')) {
                     showMessage('您已经绑定了上级', 'error');
-                } else if (error.message.includes('cannot bind yourself')) {
-                    showMessage('不能绑定自己为上级', 'error');
                 } else if (error.message.includes('User rejected')) {
                     showMessage('您取消了交易', 'error');
                 } else {
-                    showMessage('绑定失败: ' + error.message, 'error');
+                    showMessage('绑定失败', 'error');
                 }
             }
             
@@ -929,10 +935,16 @@
             btn.disabled = false;
         }
         
-        // 加载下级
+        // ==================== 加载下级列表（通过事件） ====================
         async function loadChildren() {
             try {
-                const children = await contract.methods.getMyReferralList().call({ from: account });
+                const events = await contract.getPastEvents('ReferralBound', {
+                    filter: { referrer: account },
+                    fromBlock: 0,
+                    toBlock: 'latest'
+                });
+                
+                const children = events.map(e => e.returnValues.user);
                 const count = children.length;
                 
                 document.getElementById('totalChildren').textContent = count;
@@ -948,45 +960,43 @@
                     `;
                     document.getElementById('qualifiedChildren').textContent = '0';
                     document.getElementById('pendingChildren').textContent = '0';
-                    document.getElementById('teamBalance').textContent = '0';
                     return;
                 }
                 
-                // 获取每个下级的详细信息
+                const currentPhase = await contract.methods.getRewardPhase().call();
+                
                 let qualifiedCount = 0;
                 let pendingCount = 0;
-                let teamTotalBalance = 0;
                 let childrenHtml = '';
                 
                 for (let i = 0; i < children.length; i++) {
                     const child = children[i];
-                    const holdInfo = await contract.methods.getUserHoldInfo(child).call();
-                    const balance = holdInfo.userBalance;
-                    const bindTime = await contract.methods.referrerBindTime(child).call();
-                    
-                    teamTotalBalance += parseFloat(balance);
+                    const [qualified, threshold, endTime] = await contract.methods.checkHoldQualified(child).call();
+                    const balance = await contract.methods.balanceOf(child).call();
+                    const isClaimed = await contract.methods.rewardClaimed(account, child, currentPhase).call();
                     
                     let statusClass = 'status-not-qualified';
                     let statusText = '未达标';
+                    let canClaim = false;
                     
-                    if (holdInfo.qualified) {
+                    if (qualified && !isClaimed) {
                         statusClass = 'status-qualified';
                         statusText = '已达标';
                         qualifiedCount++;
-                    } else if (holdInfo.currentThreshold > 0) {
+                        canClaim = true;
+                    } else if (threshold > 0 && balance > 0) {
                         statusClass = 'status-pending';
                         statusText = '持仓中';
                         pendingCount++;
                     }
                     
-                    const remainingTime = holdInfo.endTime > 0 && !holdInfo.qualified 
-                        ? Math.max(0, holdInfo.endTime - Math.floor(Date.now() / 1000)) 
-                        : 0;
+                    const now = Math.floor(Date.now() / 1000);
+                    const remainingTime = endTime > now ? endTime - now : 0;
                     
                     childrenHtml += `
                         <div class="child-item">
                             <div class="child-header">
-                                <span class="child-address">${formatAddress(child)}</span>
+                                <span class="child-address">${child}</span>
                                 <span class="child-status ${statusClass}">${statusText}</span>
                             </div>
                             <div class="child-details">
@@ -996,13 +1006,21 @@
                                 </div>
                                 <div class="detail-item">
                                     <div class="detail-label">目标门槛</div>
-                                    <div class="detail-value ${holdInfo.userBalance >= holdInfo.currentThreshold ? 'qualified' : 'not-qualified'}">
-                                        ${holdInfo.currentThreshold > 0 ? formatTokenAmount(holdInfo.currentThreshold) : '-'}
-                                    </div>
+                                    <div class="detail-value">${threshold > 0 ? formatTokenAmount(threshold) : '-'}</div>
                                 </div>
                                 <div class="detail-item">
-                                    <div class="detail-label">绑定时间</div>
-                                    <div class="detail-value">${formatTime(bindTime)}</div>
+                                    <div class="detail-label">时间状态</div>
+                                    <div class="detail-value">${remainingTime > 0 ? formatTimeLeft(remainingTime) : (qualified ? '✅' : '❌')}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">操作</div>
+                                    <div class="detail-value">
+                                        <button class="claim-btn-small" 
+                                            onclick="claimSingleReward('${child}')" 
+                                            ${canClaim ? '' : 'disabled'}>
+                                            ${isClaimed ? '已领取' : '领取'}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1012,10 +1030,93 @@
                 document.getElementById('childrenList').innerHTML = childrenHtml;
                 document.getElementById('qualifiedChildren').textContent = qualifiedCount;
                 document.getElementById('pendingChildren').textContent = pendingCount;
-                document.getElementById('teamBalance').textContent = formatTokenAmount(teamTotalBalance.toString());
                 
             } catch (error) {
                 console.error('加载下级失败:', error);
+            }
+        }
+        
+        // ==================== 领取单个下级奖励 ====================
+        async function claimSingleReward(childAddress) {
+            const btn = event.target;
+            
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="loading"></span>';
+                
+                await contract.methods.claimReward(childAddress).send({
+                    from: account,
+                    gas: 200000
+                });
+                
+                showMessage('🎉 领取成功！');
+                await loadChildren();
+                
+            } catch (error) {
+                console.error('领取失败:', error);
+                if (error.message.includes('User rejected')) {
+                    showMessage('您取消了交易', 'error');
+                } else {
+                    showMessage('领取失败', 'error');
+                }
+                btn.innerHTML = '领取';
+                btn.disabled = false;
+            }
+        }
+        
+        // ==================== 上级资格状态 ====================
+        async function loadUpQualifyStatus() {
+            try {
+                const qualifyList = document.getElementById('qualifyList');
+                
+                const myReferrer = await contract.methods.referrer(account).call();
+                const hasReferrer = myReferrer && myReferrer !== '0x0000000000000000000000000000000000000000';
+                const balance = await contract.methods.balanceOf(account).call();
+                const balanceNum = parseFloat(balance) / Math.pow(10, CONFIG.DECIMALS);
+                
+                const currentPhase = await contract.methods.getRewardPhase().call();
+                
+                let threshold = 100000;
+                let rewardPercent = 1;
+                if (currentPhase == 2) {
+                    threshold = 300000;
+                    rewardPercent = 3;
+                } else if (currentPhase == 3) {
+                    threshold = 100000;
+                    rewardPercent = 5;
+                }
+                
+                const qualified = balanceNum >= threshold;
+                
+                qualifyList.innerHTML = `
+                    <div class="qualify-item">
+                        <span class="qualify-label">1. 绑定上级</span>
+                        <span class="qualify-status" style="color: ${hasReferrer ? '#4caf50' : '#f44336'}">
+                            ${hasReferrer ? '✅ 已绑定' : '❌ 未绑定'}
+                        </span>
+                    </div>
+                    <div class="qualify-item">
+                        <span class="qualify-label">2. 当前持仓 ≥ ${formatTokenAmount((threshold * 1e18).toString())}</span>
+                        <span class="qualify-status" style="color: ${qualified ? '#4caf50' : '#f44336'}">
+                            ${qualified ? '✅ 已达标' : '❌ 未达标 (' + formatTokenAmount(balance) + ')'}
+                        </span>
+                    </div>
+                    <div class="qualify-item">
+                        <span class="qualify-label">3. 当前阶段奖励比例</span>
+                        <span class="qualify-status" style="color: #f093fb">
+                            第${currentPhase}阶段 - ${rewardPercent}%
+                        </span>
+                    </div>
+                    <div class="qualify-item">
+                        <span class="qualify-label">💡 提示</span>
+                        <span class="qualify-status" style="color: #8892b0; font-size: 12px;">
+                            必须先绑定上级才能推广下级
+                        </span>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('加载资格状态失败:', error);
             }
         }
         
@@ -1025,89 +1126,6 @@
             input.select();
             document.execCommand('copy');
             showMessage('推广链接已复制！');
-        }
-        
-        // ==================== 一键领取奖励 ====================
-        async function claimAllRewards() {
-            const btn = document.getElementById('claimBtn');
-            
-            try {
-                // 检查是否有可领取的奖励
-                const claimableCount = await contract.methods.getClaimableReferralsCount().call({ from: account });
-                
-                if (claimableCount == 0) {
-                    showMessage('暂无可领取的奖励', 'error');
-                    return;
-                }
-                
-                btn.disabled = true;
-                btn.innerHTML = '<span class="loading"></span>领取中...';
-                
-                // 调用合约一键领取
-                await contract.methods.claimAllReferralRewards().send({ 
-                    from: account,
-                    gas: 500000
-                });
-                
-                showMessage('🎉 奖励领取成功！已到账');
-                
-                // 刷新数据
-                await loadRelations();
-                await loadClaimableInfo();
-                
-            } catch (error) {
-                console.error('领取失败:', error);
-                if (error.message.includes('no claimable')) {
-                    showMessage('暂无可领取的奖励', 'error');
-                } else if (error.message.includes('User rejected')) {
-                    showMessage('您取消了交易', 'error');
-                } else {
-                    showMessage('领取失败: ' + error.message, 'error');
-                }
-            }
-            
-            btn.innerHTML = '🏆 一键领取所有奖励';
-            btn.disabled = false;
-        }
-        
-        // 加载可领取奖励信息
-        async function loadClaimableInfo() {
-            try {
-                const claimableCount = await contract.methods.getClaimableReferralsCount().call({ from: account });
-                document.getElementById('claimableCount2').textContent = claimableCount + ' 人';
-                
-                // 获取当前阶段
-                const phase = await contract.methods.getRewardPhase().call({ from: account });
-                
-                // 计算预估奖励
-                const children = await contract.methods.getMyReferralList().call({ from: account });
-                let totalReward = 0;
-                
-                for (let i = 0; i < children.length; i++) {
-                    const child = children[i];
-                    const holdInfo = await contract.methods.getUserHoldInfo(child).call();
-                    
-                    // 检查是否已领取
-                    const claimed = await contract.methods.rewardClaimed(account, child, phase).call();
-                    if (claimed) continue;
-                    
-                    // 检查是否达标
-                    if (holdInfo.qualified && holdInfo.currentThreshold > 0) {
-                        // 根据阶段计算奖励比例
-                        let rewardPercent = 1; // 默认1%
-                        if (phase == 2) rewardPercent = 3;
-                        if (phase == 3) rewardPercent = 5;
-                        
-                        const reward = (BigInt(holdInfo.currentThreshold) * BigInt(rewardPercent)) / BigInt(100);
-                        totalReward += Number(reward);
-                    }
-                }
-                
-                document.getElementById('claimableAmount').textContent = formatTokenAmount(totalReward.toString()) + ' 代币';
-                
-            } catch (error) {
-                console.error('加载奖励信息失败:', error);
-            }
         }
         
         // ==================== 监听钱包切换 ====================
@@ -1123,8 +1141,12 @@
         
         // ==================== 页面加载 ====================
         window.addEventListener('DOMContentLoaded', () => {
-            if (CONFIG.TOKEN_ADDRESS === "0x0000000000000000000000000000000000000000") {
-                showMessage('请先配置代币合约地址', 'error');
+            if (typeof window.ethereum !== 'undefined') {
+                window.ethereum.request({ method: 'eth_accounts' }).then(accounts => {
+                    if (accounts.length > 0) {
+                        connectWallet();
+                    }
+                });
             }
         });
     </script>
