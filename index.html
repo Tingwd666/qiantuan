@@ -467,48 +467,63 @@
                 const userReferrer = await contract.methods.referrer(currentAccount).call();
                 const hasReferrer = userReferrer !== '0x0000000000000000000000000000000000000000';
                 
-                // 如果没有上级，显示绑定界面
-                if (!hasReferrer) {
-                    console.log('用户没有上级，需要绑定上级才能开始推广');
+                // 如果已有上级，显示绑定状态（不允许重新绑定）
+                if (hasReferrer) {
+                    console.log('用户已有上级:', userReferrer);
                     
-                    // 检查URL参数中的推荐地址（ref=）
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const refAddress = urlParams.get('ref');
-                    const seedAddress = urlParams.get('seed');
-                    
-                    // 优先级：ref参数 > seed参数 > 默认地址
-                    let defaultAddress = '0x0985a0638a930888F98beA61471c309cf8AA57b6';
-                    let addressSource = '默认';
-                    
-                    if (refAddress && isValidAddress(refAddress)) {
-                        defaultAddress = refAddress;
-                        addressSource = '推广链接';
-                    } else if (seedAddress && isValidAddress(seedAddress)) {
-                        defaultAddress = seedAddress;
-                        addressSource = '种子链接';
-                    }
-                    
-                    // 自动生成种子链接（包含指定上级地址）
-                    const baseUrl = window.location.origin + window.location.pathname;
-                    const seedLink = `${baseUrl}?seed=${defaultAddress}`;
-                    
-                    // 修改绑定界面，提供一个默认选项
-                    let infoText = '';
-                    if (addressSource === '默认') {
-                        infoText = '默认上级地址已预填（0x0985...57b6）。<br>绑定上级是可选的，无论是否绑定都可以开始推广。';
-                    } else {
-                        infoText = '✅ 已从' + addressSource + '自动获取上级地址：' + defaultAddress.slice(0, 6) + '...' + defaultAddress.slice(-4);
-                    }
-                    
+                    // 显示已绑定状态
                     document.getElementById('bindSection').innerHTML = 
-                        '<div class="section-title">👥 绑定上级（可选）</div>' +
-                        '<input type="text" id="bindInput" class="bind-input" value="' + defaultAddress + '" placeholder="粘贴上级地址...">' +
-                        '<p style="font-size: 13px; color: #8892b0; margin-bottom: 15px; line-height: 1.6;">' + infoText + '</p>' +
-                        '<button id="bindBtn" class="bind-btn" onclick="bindReferrer()">🔗 绑定上级</button>' +
-                        '<button id="skipBindBtn" class="bind-btn" onclick="skipBindReferrer()" style="background: #444d68; margin-left: 10px;">跳过绑定</button>';
+                        '<div class="section-title">✅ 已绑定上级</div>' +
+                        '<p style="font-size: 13px; color: #00ff88; margin-bottom: 10px; line-height: 1.6;">' +
+                        '您的钱包已绑定上级：<br>' + 
+                        '<span style="font-family: monospace; color: #00d4ff;">' + userReferrer + '</span></p>' +
+                        '<p style="font-size: 12px; color: #ffc107; margin-bottom: 10px; line-height: 1.6;">' +
+                        '⚠️ 每个钱包只能绑定一个上级，绑定后无法修改或解除！</p>' +
+                        '<p style="font-size: 12px; color: #8892b0; line-height: 1.6;">' +
+                        '您现在可以使用上方的推广链接邀请好友了。</p>';
+                    
+                    return true;
                 }
                 
-                return hasReferrer;
+                // 如果没有上级，显示绑定界面
+                console.log('用户没有上级，显示绑定选项');
+                
+                // 检查URL参数中的推荐地址（ref=）
+                const urlParams = new URLSearchParams(window.location.search);
+                const refAddress = urlParams.get('ref');
+                const seedAddress = urlParams.get('seed');
+                
+                // 优先级：ref参数 > seed参数 > 默认地址
+                let defaultAddress = '0x0985a0638a930888F98beA61471c309cf8AA57b6';
+                let addressSource = '默认';
+                
+                if (refAddress && isValidAddress(refAddress)) {
+                    defaultAddress = refAddress;
+                    addressSource = '推广链接';
+                } else if (seedAddress && isValidAddress(seedAddress)) {
+                    defaultAddress = seedAddress;
+                    addressSource = '种子链接';
+                }
+                
+                // 修改绑定界面，提供选项
+                let infoText = '';
+                if (addressSource === '默认') {
+                    infoText = '默认上级地址已预填（0x0985...57b6）。<br>绑定上级是可选的，无论是否绑定都可以开始推广。';
+                } else {
+                    infoText = '✅ 已从' + addressSource + '自动获取上级地址：' + defaultAddress.slice(0, 6) + '...' + defaultAddress.slice(-4);
+                }
+                
+                document.getElementById('bindSection').innerHTML = 
+                    '<div class="section-title">👥 绑定上级（可选）</div>' +
+                    '<p style="font-size: 12px; color: #ffc107; margin-bottom: 10px; line-height: 1.6;">' +
+                    '⚠️ 重要提示：每个钱包只能绑定一个上级，绑定后无法修改！</p>' +
+                    '<input type="text" id="bindInput" class="bind-input" value="' + defaultAddress + '" placeholder="粘贴上级地址...">' +
+                    '<p style="font-size: 13px; color: #8892b0; margin-bottom: 15px; line-height: 1.6;">' + infoText + '</p>' +
+                    '<button id="bindBtn" class="bind-btn" onclick="bindReferrer()">🔗 绑定上级</button>' +
+                    '<button id="skipBindBtn" class="bind-btn" onclick="skipBindReferrer()" style="background: #444d68; margin-left: 10px;">跳过绑定</button>';
+                
+                return false;
+                
             } catch (error) {
                 console.error('检查referrer状态失败:', error);
                 
@@ -540,6 +555,8 @@
                 
                 document.getElementById('bindSection').innerHTML = 
                     '<div class="section-title">👥 绑定上级（合约暂时无响应）</div>' +
+                    '<p style="font-size: 12px; color: #ffc107; margin-bottom: 10px; line-height: 1.6;">' +
+                    '⚠️ 重要提示：每个钱包只能绑定一个上级，绑定后无法修改！</p>' +
                     '<input type="text" id="bindInput" class="bind-input" value="' + defaultAddress + '" placeholder="粘贴上级地址...">' +
                     '<p style="font-size: 13px; color: #8892b0; margin-bottom: 15px; line-height: 1.6;">' + errorInfoText + '</p>' +
                     '<button id="bindBtn" class="bind-btn" onclick="bindReferrer()">🔗 绑定上级</button>' +
@@ -768,10 +785,32 @@
                 
             } catch (error) {
                 console.error('绑定失败:', error);
-                if (error.message.includes('already bound')) {
-                    showMessage('您已经绑定过上级了', 'error');
+                console.log('错误详情:', error);
+                
+                // 检查是否是"已经绑定"错误
+                if (error.message.includes('already bound') || 
+                    error.message.includes('revert') ||
+                    error.message.includes('already')) {
+                    
+                    showMessage('您已经绑定过上级了，可以直接推广！', 'info');
+                    
+                    // 自动隐藏绑定区域，显示推广成功
+                    document.getElementById('bindSection').innerHTML = 
+                        '<div class="section-title">✅ 绑定状态</div>' +
+                        '<p style="font-size: 13px; color: #00ff88; margin-bottom: 15px; line-height: 1.6;">' +
+                        '您已经绑定过上级了。现在可以使用上面的推广链接邀请好友了！</p>' +
+                        '<button id="showBindBtn" class="bind-btn" onclick="showBindSection()">重新绑定</button>';
                 } else {
-                    showMessage('绑定失败: ' + error.message, 'error');
+                    showMessage('绑定失败，但您仍可以跳过绑定直接推广', 'info');
+                    
+                    // 显示跳过绑定选项
+                    document.getElementById('bindSection').innerHTML = 
+                        '<div class="section-title">⚠️ 绑定失败（可跳过）</div>' +
+                        '<p style="font-size: 13px; color: #ffc107; margin-bottom: 15px; line-height: 1.6;">' +
+                        '绑定失败原因: ' + (error.message.substring(0, 100)) + '</p>' +
+                        '<p style="font-size: 13px; color: #8892b0; margin-bottom: 15px; line-height: 1.6;">' +
+                        '您仍然可以跳过绑定，直接使用推广链接邀请好友！</p>' +
+                        '<button id="skipBindBtn" class="bind-btn" onclick="skipBindReferrer()" style="background: #444d68;">跳过绑定，直接推广</button>';
                 }
             }
             
