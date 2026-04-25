@@ -673,22 +673,37 @@
                     const blackHoleWei = BigInt(blackHoleAmount);
                     const blackHoleToken = Number(blackHoleWei) / 1e18;
                     console.log('黑洞销毁量:', blackHoleToken, '代币');
+                    console.log('黑洞销毁量 (原始):', blackHoleAmount);
                 
                     // 测试版合约阶段判断阈值：
-                    // 第一阶段：黑洞销毁 ≥ 10,000 (1万) 代币
-                    // 第二阶段：黑洞销毁 ≥ 15,000 (1.5万) 代币
-                    // 第三阶段：黑洞销毁 ≥ 18,000 (1.8万) 代币 → 停止奖励
+                    // 第一阶段：黑洞销毁 < 10,000 (1万) 代币
+                    // 第二阶段：黑洞销毁 ≥ 10,000 且 < 15,000 代币
+                    // 第三阶段：黑洞销毁 ≥ 15,000 且 < 18,000 代币
+                    // 阶段0：黑洞销毁 ≥ 18,000 代币 → 停止奖励
                     
                     if (blackHoleToken >= 18000) {
                         phase = 0; // 已结束
+                        console.log('符合条件: blackHoleToken >= 18000');
                     } else if (blackHoleToken >= 15000) {
                         phase = 3;
+                        console.log('符合条件: blackHoleToken >= 15000 且 < 18000');
                     } else if (blackHoleToken >= 10000) {
                         phase = 2;
+                        console.log('符合条件: blackHoleToken >= 10000 且 < 15000');
                     } else {
                         phase = 1;
+                        console.log('符合条件: blackHoleToken < 10000');
                     }
                     console.log('计算出的阶段:', phase);
+                    
+                    // 同时获取合约的阶段值
+                    try {
+                        const contractPhase = await contract.methods.getRewardPhase().call();
+                        console.log('合约返回的阶段值:', contractPhase);
+                    } catch (phaseErr) {
+                        console.log('获取合约阶段失败:', phaseErr);
+                    }
+                    
                 } catch (e2) {
                     console.log('获取黑洞数据失败,使用默认阶段1:', e2);
                 }
