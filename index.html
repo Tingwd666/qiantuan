@@ -310,11 +310,11 @@
             
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div id="referralCount" class="stat-value">0</div>
+                    <div id="referralCount" class="stat-value">-</div>
                     <div class="stat-label">邀请人数</div>
                 </div>
                 <div class="stat-card">
-                    <div id="qualifiedCount" class="stat-value">0</div>
+                    <div id="qualifiedCount" class="stat-value">-</div>
                     <div class="stat-label">达标人数</div>
                 </div>
                 <div class="stat-card">
@@ -322,13 +322,26 @@
                     <div class="stat-label">当前阶段</div>
                 </div>
                 <div class="stat-card">
-                    <div id="claimableCount" class="stat-value">0</div>
+                    <div id="claimableCount" class="stat-value">-</div>
                     <div class="stat-label">可领取奖励</div>
                 </div>
                 <div class="stat-card">
-                    <div id="totalReward" class="stat-value">0</div>
+                    <div id="totalReward" class="stat-value">-</div>
                     <div class="stat-label">预估奖励(代币)</div>
                 </div>
+            </div>
+            
+            <div class="wallet-section" style="background: rgba(255, 193, 7, 0.05); border: 1px solid rgba(255, 193, 7, 0.2); padding: 12px;">
+                <p style="font-size: 11px; color: #ffc107; line-height: 1.6;">
+                    📋 数据说明：<br>
+                    • <strong>邀请人数</strong>：绑定您为上级的用户数量（需要下级买入代币后才能确认关系）<br>
+                    • <strong>达标人数</strong>：您的下级中满足领取条件的数量<br>
+                    • <strong>当前阶段</strong>：根据黑洞销毁量自动判定<br>
+                    • <strong>阶段规则</strong>：<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;▸ 第一阶段：黑洞销毁 ≥1万 代币，奖励1%<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;▸ 第二阶段：黑洞销毁 ≥1.5万 代币，奖励3%<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;▸ 第三阶段：黑洞销毁 ≥1.8万 代币，奖励5%（达此量停止奖励）
+                </p>
             </div>
             
             <div class="wallet-section">
@@ -354,18 +367,18 @@
             </div>
             
             <div class="wallet-section claim-section">
-                <div class="section-title">💰 一键领取所有推广奖励</div>
+                <div class="section-title">💰 领取推广奖励</div>
                 <div class="reward-info">
-                    <div>📊 奖励规则：</div>
-                    <div>• 第一阶段：1% 奖励（前100万代币销毁）</div>
-                    <div>• 第二阶段：3% 奖励（100万-500万销毁）</div>
-                    <div>• 第三阶段：5% 奖励（500万-1000万销毁）</div>
+                    <div>📊 奖励规则（根据黑洞销毁量判定）：</div>
+                    <div>• 第一阶段：黑洞销毁 ≥1万 代币，奖励1%</div>
+                    <div>• 第二阶段：黑洞销毁 ≥1.5万 代币，奖励3%</div>
+                    <div>• 第三阶段：黑洞销毁 ≥1.8万 代币，奖励5%</div>
                 </div>
                 <button id="claimBtn" class="claim-btn" onclick="claimAllRewards()">
-                    🏆 一键领取奖励
+                    🏆 领取奖励
                 </button>
                 <p class="info-text">
-                    系统将自动检查您所有下级的购买记录，并领取符合条件的奖励。
+                    请使用上方"手动检查下级地址"功能输入下级钱包地址进行查询和领取。
                 </p>
             </div>
         </div>
@@ -403,6 +416,14 @@
                 "inputs": [],
                 "name": "getRewardPhase",
                 "outputs": [{"internalType": "uint8", "name": "", "type": "uint8"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            // 获取黑洞销毁量
+            {
+                "inputs": [],
+                "name": "getBurnedAmount",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
                 "stateMutability": "view",
                 "type": "function"
             },
@@ -642,20 +663,56 @@
         
         async function loadStats() {
             try {
-                const phase = await contract.methods.getRewardPhase().call({ from: currentAccount });
-                let phaseText = '已结束';
+                // 获取黑洞销毁量
+                let phase = 0;
+                let blackHoleAmount = 0;
+                
+                // 首先尝试获取 getRewardPhase
+                try {
+                    phase = await contract.methods.getRewardPhase().call({ from: currentAccount });
+                    console.log('getRewardPhase 返回:', phase);
+                } catch (e1) {
+                    console.log('getRewardPhase 不支持，尝试 getBlackHoleAmount');
+                        // 备用方案：根据黑洞销毁量计算
+                        try {
+                            blackHoleAmount = await contract.methods.getBurnedAmount().call();
+                            const blackHoleWei = BigInt(blackHoleAmount);
+                            const blackHoleToken = Number(blackHoleWei) / 1e18;
+                        
+                        // 测试版合约阶段判断阈值：
+                        // 第一阶段：黑洞销毁 ≥ 10,000 (1万) 代币
+                        // 第二阶段：黑洞销毁 ≥ 15,000 (1.5万) 代币
+                        // 第三阶段：黑洞销毁 ≥ 18,000 (1.8万) 代币 → 停止奖励
+                        
+                        if (blackHoleToken >= 18000) {
+                            phase = 0; // 已结束
+                        } else if (blackHoleToken >= 15000) {
+                            phase = 3;
+                        } else if (blackHoleToken >= 10000) {
+                            phase = 2;
+                        } else {
+                            phase = 1;
+                        }
+                    } catch (e2) {
+                        console.log('获取黑洞数据失败');
+                    }
+                }
+                
+                // 显示阶段
+                let phaseText = '未开始';
                 if (phase == 1) phaseText = '第一阶段 (1%)';
                 if (phase == 2) phaseText = '第二阶段 (3%)';
                 if (phase == 3) phaseText = '第三阶段 (5%)';
+                if (phase == 0) phaseText = '已结束';
                 
                 document.getElementById('currentPhase').textContent = phaseText;
                 
                 const hasReferrer = await checkUserReferrerStatus();
                 
-                // 总是显示统计值，使用默认值（合约可能没有这些函数）
-                document.getElementById('referralCount').textContent = '0';
-                document.getElementById('qualifiedCount').textContent = '0';
-                document.getElementById('claimableCount').textContent = hasReferrer ? '手动检查' : '0';
+                // 初始化统计值（合约不支持时显示-）
+                document.getElementById('referralCount').textContent = '-';
+                document.getElementById('qualifiedCount').textContent = '-';
+                document.getElementById('claimableCount').textContent = '-';
                 document.getElementById('totalReward').textContent = '-';
                 
                 // 尝试获取团队人数（如果合约支持）
@@ -689,45 +746,62 @@
                 const baseUrl = window.location.origin + window.location.pathname;
                 document.getElementById('referralLink').value = `${baseUrl}?ref=${currentAccount}`;
                 
+                // 总是添加手动检查功能
                 addManualCheckFeature();
                 
             } catch (error) {
                 console.error('加载数据失败:', error);
-                showMessage('加载数据失败，请检查合约地址', 'error');
+                // 即使加载失败，也要添加手动检查功能
+                addManualCheckFeature();
+                showMessage('部分数据加载失败，请使用手动检查功能', 'info');
             }
         }
         
         // 添加手动检查功能
         function addManualCheckFeature() {
-            if (document.getElementById('manualCheckSection')) return;
+            // 检查是否已经添加过
+            const existingSection = document.getElementById('manualCheckSection');
+            if (existingSection) {
+                existingSection.remove();
+            }
             
-            const container = document.querySelector('.container');
+            // 找到walletInfo的最后一个card，在其后面插入
+            const walletInfo = document.getElementById('walletInfo');
+            const lastCard = walletInfo.lastElementChild;
+            
             const manualCheckHtml = `
                 <div id="manualCheckSection" class="wallet-section" style="margin-top: 20px;">
-                    <div class="section-title">🔍 手动检查单个地址</div>
-                    <p style="font-size: 13px; color: #8892b0; margin-bottom: 15px; line-height: 1.6;">
-                        由于区块链技术限制，合约无法提供完整的下级地址列表。<br>
-                        请手动输入您邀请的下级地址进行检查和领取奖励。
+                    <div class="section-title">🔍 手动检查下级地址</div>
+                    <p style="font-size: 12px; color: #ffc107; margin-bottom: 10px; line-height: 1.6;">
+                        ⚠️ 重要说明：区块链无法自动列出下级地址，请手动输入您邀请的下级钱包地址进行查询。
+                    </p>
+                    <p style="font-size: 12px; color: #8892b0; margin-bottom: 15px; line-height: 1.6;">
+                        使用方法：输入您通过推广链接邀请的下级钱包地址，点击"检查该地址"查看是否有可领取奖励。
                     </p>
                     
                     <div style="margin-bottom: 15px;">
-                        <input type="text" id="checkAddressInput" class="bind-input" placeholder="输入下级钱包地址 (0x...)" style="margin-bottom: 10px;">
-                        <button id="checkAddressBtn" class="bind-btn" onclick="checkAddressForRewards()" style="margin-bottom: 10px;">
-                            检查该地址
-                        </button>
+                        <input type="text" id="checkAddressInput" class="bind-input" placeholder="输入下级钱包地址 (0x...)">
                     </div>
+                    
+                    <button id="checkAddressBtn" class="bind-btn" style="margin-bottom: 15px;">
+                        🔍 检查该地址
+                    </button>
                     
                     <div id="checkResult" style="display: none; background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.1);">
                         <h4 style="color: #fff; margin-bottom: 12px; font-size: 14px;">检查结果</h4>
                         <div id="checkResultContent" style="margin-bottom: 15px;"></div>
-                        <button id="claimSingleBtn" class="claim-btn" onclick="claimSingleAddress()" style="font-size: 14px; padding: 12px; display: none;">
+                        <button id="claimSingleBtn" class="claim-btn" style="font-size: 14px; padding: 12px; display: none;">
                             🎁 领取该地址奖励
                         </button>
                     </div>
                 </div>
             `;
             
-            container.insertAdjacentHTML('beforeend', manualCheckHtml);
+            lastCard.insertAdjacentHTML('afterend', manualCheckHtml);
+            
+            // 绑定按钮事件
+            document.getElementById('checkAddressBtn').addEventListener('click', checkAddressForRewards);
+            document.getElementById('claimSingleBtn').addEventListener('click', claimSingleAddress);
         }
         
         // ==================== 推广绑定 ====================
