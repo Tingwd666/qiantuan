@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>小翼龙 Token</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+        
+        /* 头部 */
+        .header {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .header .subtitle {
+            color: rgba(255,255,255,0.6);
+            font-size: 13px;
+        }
+        
+        /* 连接状态 */
+        .status-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #666;
+        }
+        
+        .status-dot.connected {
+            background: #00d26a;
+            box-shadow: 0 0 8px #00d26a;
+        }
+        
+        .status-text {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        /* 连接钱包界面 */
+        .wallet-section {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .connect-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(102,126,234,0.4);
+        }
+        
+        /* 主内容 */
+        .hidden {
+            display: none !important;
+        }
+        
+        /* 卡片 */
+        .card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        /* 代币信息 */
+        .token-info {
+            text-align: center;
+        }
+        
+        .token-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .token-price {
+            font-size: 28px;
+            font-weight: 700;
+            color: #00d26a;
+            margin-bottom: 4px;
+        }
+        
+        .token-change {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        /* 四个锁仓数据 - 2x2网格 */
+        .lock-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .lock-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+        }
+        
+        .lock-card.private {
+            border-left: 3px solid #00d26a;
+        }
+        
+        .lock-card.project {
+            border-left: 3px solid #ffc107;
+        }
+        
+        .lock-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 6px;
+        }
+        
+        .lock-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .lock-card.private .lock-value {
+            color: #00d26a;
+        }
+        
+        .lock-card.project .lock-value {
+            color: #ffc107;
+        }
+        
+        /* 进度条 */
+        .progress-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        
+        .progress-bar .fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+        
+        .progress-bar.green .fill {
+            background: linear-gradient(90deg, #00d26a, #00ff88);
+        }
+        
+        .progress-bar.yellow .fill {
+            background: linear-gradient(90deg, #ffc107, #ffdd59);
+        }
+        
+        /* 阶段信息 */
+        .phase-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        
+        .phase-item {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+        }
+        
+        .phase-item.active {
+            background: rgba(102,126,234,0.3);
+            border: 1px solid #667eea;
+        }
+        
+        .phase-num {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .phase-item.active .phase-num {
+            color: #667eea;
+        }
+        
+        .phase-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        /* 用户信息 */
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .user-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 12px;
+        }
+        
+        .user-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 4px;
+        }
+        
+        .user-value {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        /* 按钮组 */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+        }
+        
+        .btn-green {
+            background: linear-gradient(135deg, #00d26a, #00b85c);
+            color: #fff;
+        }
+        
+        .btn-yellow {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #1a1a2e;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* 输入框 */
+        .input-group {
+            margin-bottom: 12px;
+        }
+        
+        .input-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 6px;
+            display: block;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .input-field:focus {
+            border-color: #667eea;
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(0,0,0,0.9);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            transition: transform 0.3s;
+            max-width: 90%;
+            text-align: center;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .toast.success { border-left: 3px solid #00d26a; }
+        .toast.error { border-left: 3px solid #ff4757; }
+        
+        /* 刷新按钮 */
+        .refresh-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(102,126,234,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .refresh-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .refresh-btn.spinning svg {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 错误提示 */
+        .error-box {
+            background: rgba(255,71,87,0.15);
+            border: 1px solid rgba(255,71,87,0.3);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #ff6b6b;
+            display: none;
+        }
+        
+        .error-box.show {
+            display: block;
+        }
+        
+        /* 响应式 */
+        @media (min-width: 768px) {
+            .container {
+                padding: 24px;
+            }
+            
+            .header h1 {
+                font-size: 28px;
+            }
+            
+            .lock-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .user-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .phase-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        /* Tab导航 */
+        .tab-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+        
+        .tab-btn {
+            padding: 10px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            border: none;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* 数据行 */
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .data-row:last-child {
+            border-bottom: none;
+        }
+        
+        .data-label {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .data-value {
+            font-size: 13px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>🐉 小翼龙 Token</h1>
+            <p class="subtitle">XYL Token Dashboard</p>
+        </div>
+        
+        <!-- 连接状态 -->
+        <div class="status-bar">
+            <div class="status-dot" id="statusDot"></div>
+            <span class="status-text" id="statusText">未连接</span>
+        </div>
+        
+        <!-- 连接钱包 -->
+        <div class="wallet-section" id="walletSection">
+            <button class="connect-btn" onclick="connectWallet()">连接钱包</button>
+        </div>
+        
+        <!-- 主内容 -->
+        <div id="mainContent" class="hidden">
+            <!-- Tab导航 -->
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="switchTab('home')">首页</button>
+                <button class="tab-btn" onclick="switchTab('lock')">锁仓数据</button>
+                <button class="tab-btn" onclick="switchTab('referral')">推广</button>
+                <button class="tab-btn" onclick="switchTab('info')">我的</button>
+            </div>
+            
+            <!-- 首页Tab -->
+            <div class="tab-content active" id="tab-home">
+                <!-- 代币信息 -->
+                <div class="card">
+                    <div class="token-info">
+                        <div class="token-name" id="tokenName">--</div>
+                        <div class="token-price" id="tokenPrice">--</div>
+                        <div class="token-change">当前阶段: <span id="currentPhase">--</span></div>
+                    </div>
+                </div>
+                
+                <!-- 阶段进度 -->
+                <div class="card">
+                    <div class="card-title">阶段进度</div>
+                    <div class="phase-grid">
+                        <div class="phase-item" id="phase1">
+                            <div class="phase-num">阶段1</div>
+                            <div class="phase-label">1% 奖励</div>
+                        </div>
+                        <div class="phase-item" id="phase2">
+                            <div class="phase-num">阶段2</div>
+                            <div class="phase-label">3% 奖励</div>
+                        </div>
+                        <div class="phase-item" id="phase3">
+                            <div class="phase-num">阶段3</div>
+                            <div class="phase-label">5% 奖励</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 快速数据 -->
+                <div class="card">
+                    <div class="card-title">合约数据</div>
+                    <div class="data-row">
+                        <span class="data-label">销毁总量</span>
+                        <span class="data-value" id="burnedAmount">--</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">流通供应</span>
+                        <span class="data-value" id="circulating">--</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">交易状态</span>
+                        <span class="data-value" id="tradingStatus">--</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 锁仓数据Tab -->
+            <div class="tab-content" id="tab-lock">
+                <div class="card">
+                    <div class="card-title">四个核心数据</div>
+                    <div class="lock-grid">
+                        <div class="lock-card private">
+                            <div class="lock-label">私募方锁仓总量</div>
+                            <div class="lock-value" id="privateLockTotal">--</div>
+                            <div class="progress-bar green">
+                                <div class="fill" id="privateProgress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="lock-card private">
+                            <div class="lock-label">私募方已释放</div>
+                            <div class="lock-value" id="privateReleased">--</div>
+                        </div>
+                        
+                        <div class="lock-card project">
+                            <div class="lock-label">项目方锁仓总量</div>
+                            <div class="lock-value" id="projectLockTotal">--</div>
+                            <div class="progress-bar yellow">
+                                <div class="fill" id="projectProgress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="lock-card project">
+                            <div class="lock-label">项目方已释放</div>
+                            <div class="lock-value" id="projectReleased">--</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 详细数据 -->
+                <div class="card">
+                    <div class="card-title">详细释放数据</div>
+                    <div class="data-row">
+                        <span class="data-label">私募42.86%总量</span>
+                        <span class="data-value" id="private30Total">--</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">私募42.86%已释放</span>
+                        <span class="data-value" id="private30Released">--</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">私募57.14%总量</span>
+                        <span class="data-value" id="private40Total">--</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">私募57.14%已释放</span>
+                        <span class="data-value" id="private40Released">--</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">项目42.86%总量</span>
+                        <span class="data-value" id="project30Total">--</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">项目42.86%已释放</span>
+                        <span class="data-value" id="project30Released">--</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">项目57.14%总量</span>
+                        <span class="data-value" id="project40Total">--</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">项目57.14%已释放</span>
+                        <span class="data-value" id="project40Released">--</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 推广Tab -->
+            <div class="tab-content" id="tab-referral">
+                <div class="card">
+                    <div class="card-title">推广信息</div>
+                    <div class="input-group">
+                        <label class="input-label">我的推荐码 / 钱包地址</label>
+                        <input type="text" class="input-field" id="myAddress" readonly>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">绑定推荐人（输入推荐人地址）</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" class="input-field" id="referrerInput" placeholder="输入推荐人地址">
+                            <button class="btn btn-primary" onclick="bindReferrer()" style="width: auto; padding: 12px 16px;">绑定</button>
+                        </div>
+                    </div>
+                    <div class="error-box" id="referralError"></div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">我的推广数据</div>
+                    <div class="user-grid">
+                        <div class="user-item">
+                            <div class="user-label">推荐关系</div>
+                            <div class="user-value" id="referrerStatus">--</div>
+                        </div>
+                        <div class="user-item">
+                            <div class="user-label">用户阶段</div>
+                            <div class="user-value" id="userPhase">--</div>
+                        </div>
+                        <div class="user-item">
+                            <div class="user-label">当前门槛</div>
+                            <div class="user-value" id="userThreshold">--</div>
+                        </div>
+                        <div class="user-item">
+                            <div class="user-label">资格状态</div>
+                            <div class="user-value" id="qualified">--</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 我的Tab -->
+            <div class="tab-content" id="tab-info">
+                <div class="card">
+                    <div class="card-title">我的钱包</div>
+                    <div class="user-grid">
+                        <div class="user-item">
+                            <div class="user-label">代币余额</div>
+                            <div class="user-value" id="userBalance">--</div>
+                        </div>
+                        <div class="user-item">
+                            <div class="user-label">累计DEX买入</div>
+                            <div class="user-value" id="dexBuy">--</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">持仓状态</div>
+                    <div class="data-row">
+                        <span class="data-label">当前持仓门槛</span>
+                        <span class="data-value" id="holdThreshold">--</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">门槛开始时间</span>
+                        <span class="data-value" id="holdStartTime">--</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">24小时解锁时间</span>
+                        <span class="data-value" id="holdEndTime">--</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">是否满足资格</span>
+                        <span class="data-value" id="holdQualified">--</span>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="disconnectWallet()">断开连接</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 刷新按钮 -->
+    <button class="refresh-btn" id="refreshBtn" onclick="refreshData()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 4v6h-6M1 20v-6h6"/>
+            <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+        </svg>
+    </button>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <script>
+        // ==================== 配置区 ====================
+        const CONFIG = {
+            BSC_RPC: "https://bsc-dataseed.binance.org/",
+            CHAIN_ID: 56,
+            
+            // 主合约地址（部署后替换）
+            MAIN_CONTRACT: "0x0000000000000000000000000000000000000000",
+            
+            // 锁仓合约地址（部署后替换）
+            LOCK_CONTRACT: "0x0000000000000000000000000000000000000000",
+            
+            TOKEN_DECIMALS: 18
+        };
+        
+        // ==================== 全局变量 ====================
+        let web3;
+        let account;
+        let mainContract;
+        let lockContract;
+        let isLoading = false;
+        
+        // ==================== 主合约ABI ====================
+        const MAIN_ABI = [
+            {"inputs":[],"name":"name","outputs":[{"type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"symbol","outputs":[{"type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"totalSupply","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"getCirculatingSupply","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"getBurnedAmount","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"tradingEnabled","outputs":[{"type":"bool"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"currentActivePhase","outputs":[{"type":"uint8"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"getActivePhase","outputs":[{"type":"uint8"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"PHASE1_BURN_TARGET","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"PHASE2_BURN_TARGET","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"PHASE3_BURN_TARGET","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"getPriceInfo","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"name":"user","type":"address"}],"name":"balanceOf","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"name":"user","type":"address"}],"name":"referrer","outputs":[{"type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"name":"user","type":"address"}],"name":"getUserPhase","outputs":[{"type":"uint8"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"name":"user","type":"address"}],"name":"getUserHoldInfo","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"bool"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"name":"user","type":"address"}],"name":"getUserDEXBuyInfo","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"bool"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"name":"user","type":"address"}],"name":"checkHoldQualified","outputs":[{"type":"bool"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"name":"refAddr","type":"address"}],"name":"bindReferrer","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[],"name":"lockContract","outputs":[{"type":"address"}],"stateMutability":"view","type":"function"}
+        ];
+        
+        // ==================== 锁仓合约ABI ====================
+        const LOCK_ABI = [
+            {"inputs":[],"name":"getAllLockInfo","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"privateLock30","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"privateLock40","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"projectLock30","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"projectLock40","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"}
+        ];
+        
+        // ==================== 工具函数 ====================
+        function formatToken(amount, decimals = CONFIG.TOKEN_DECIMALS) {
+            if (!amount || amount === '0') return '0';
+            const num = BigInt(amount);
+            const divisor = BigInt(10 ** decimals);
+            const whole = num / divisor;
+            const remainder = num % divisor;
+            const fraction = remainder.toString().padStart(decimals, '0').slice(0, 4);
+            if (remainder === 0n) return whole.toLocaleString();
+            return `${whole}.${fraction}`.replace(/\.?0+$/, '');
+        }
+        
+        function formatDate(timestamp) {
+            if (!timestamp || timestamp === '0') return '--';
+            const date = new Date(Number(timestamp) * 1000);
+            return date.toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'});
+        }
+        
+        function calcProgress(released, total) {
+            if (!total || total === '0') return 0;
+            const r = BigInt(released);
+            const t = BigInt(total);
+            if (t === 0n) return 0;
+            return Number((r * 10000n) / t) / 100;
+        }
+        
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        
+        function showError(msg, elementId = 'referralError') {
+            const box = document.getElementById(elementId);
+            box.textContent = msg;
+            box.classList.add('show');
+            setTimeout(() => box.classList.remove('show'), 5000);
+        }
+        
+        // ==================== Tab切换 ====================
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+        
+        // ==================== Web3连接 ====================
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                showToast('请安装 MetaMask 钱包', 'error');
+                return;
+            }
+            
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                if (accounts.length === 0) throw new Error('未授权钱包');
+                
+                account = accounts[0];
+                web3 = new Web3(window.ethereum);
+                mainContract = new web3.eth.Contract(MAIN_ABI, CONFIG.MAIN_CONTRACT);
+                
+                // 检查网络
+                const chainId = await web3.eth.getChainId();
+                if (Number(chainId) !== CONFIG.CHAIN_ID) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: `0x${CONFIG.CHAIN_ID.toString(16)}` }]
+                        });
+                    } catch (switchError) {
+                        if (switchError.code !== 4902) throw switchError;
+                        showToast('请手动切换到 BSC 主网', 'error');
+                    }
+                }
+                
+                // 更新UI
+                document.getElementById('walletSection').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+                updateStatus('connected', account.slice(0,6) + '...' + account.slice(-4));
+                
+                // 显示我的地址
+                document.getElementById('myAddress').value = account;
+                
+                await refreshData();
+                
+                window.ethereum.on('accountsChanged', (accounts) => {
+                    if (accounts.length === 0) disconnectWallet();
+                    else { account = accounts[0]; refreshData(); }
+                });
+                
+                window.ethereum.on('chainChanged', () => window.location.reload());
+                
+            } catch (error) {
+                console.error('连接失败:', error);
+                showToast(error.message || '连接失败', 'error');
+            }
+        }
+        
+        function disconnectWallet() {
+            account = null;
+            mainContract = null;
+            document.getElementById('walletSection').classList.remove('hidden');
+            document.getElementById('mainContent').classList.add('hidden');
+            updateStatus('', '未连接');
+        }
+        
+        function updateStatus(state, text) {
+            document.getElementById('statusDot').className = 'status-dot ' + state;
+            document.getElementById('statusText').textContent = text;
+        }
+        
+        // ==================== 绑定推荐人 ====================
+        async function bindReferrer() {
+            const refAddr = document.getElementById('referrerInput').value.trim();
+            if (!web3.utils.isAddress(refAddr)) {
+                showError('请输入有效的钱包地址');
+                return;
+            }
+            
+            try {
+                await mainContract.methods.bindReferrer(refAddr).send({ from: account });
+                showToast('绑定成功！', 'success');
+                refreshData();
+            } catch (error) {
+                console.error('绑定失败:', error);
+                let msg = '绑定失败';
+                if (error.message.includes('AlreadyBound')) msg = '您已经绑定过推荐人';
+                else if (error.message.includes('InvalidReferrer')) msg = '不能绑定自己为推荐人';
+                else if (error.message.includes('user rejected')) msg = '用户取消签名';
+                showError(msg);
+            }
+        }
+        
+        // ==================== 数据刷新 ====================
+        async function refreshData() {
+            if (!mainContract || isLoading) return;
+            
+            const btn = document.getElementById('refreshBtn');
+            btn.classList.add('spinning');
+            isLoading = true;
+            
+            try {
+                // 代币基本信息
+                const name = await mainContract.methods.name().call();
+                document.getElementById('tokenName').textContent = name;
+                
+                // 阶段信息
+                const activePhase = await mainContract.methods.getActivePhase().call();
+                const phaseNum = Number(activePhase);
+                document.getElementById('currentPhase').textContent = phaseNum === 0 ? '已结束' : `阶段${phaseNum}`;
+                
+                // 更新阶段UI
+                ['phase1', 'phase2', 'phase3'].forEach((id, i) => {
+                    document.getElementById(id).classList.toggle('active', i + 1 === phaseNum);
+                });
+                
+                // 销毁数据
+                const burned = await mainContract.methods.getBurnedAmount().call();
+                const circulating = await mainContract.methods.getCirculatingSupply().call();
+                document.getElementById('burnedAmount').textContent = formatToken(burned);
+                document.getElementById('circulating').textContent = formatToken(circulating);
+                
+                // 交易状态
+                const trading = await mainContract.methods.tradingEnabled().call();
+                document.getElementById('tradingStatus').textContent = trading ? '已开启' : '未开启';
+                
+                // 价格
+                try {
+                    const priceInfo = await mainContract.methods.getPriceInfo().call();
+                    if (priceInfo[2] > 0) {
+                        const priceBNB = Number(priceInfo[2]) / 1e18;
+                        document.getElementById('tokenPrice').textContent = priceBNB.toFixed(8) + ' BNB';
+                    }
+                } catch (e) {}
+                
+                // 用户数据
+                const balance = await mainContract.methods.balanceOf(account).call();
+                document.getElementById('userBalance').textContent = formatToken(balance);
+                
+                const userReferrer = await mainContract.methods.referrer(account).call();
+                document.getElementById('referrerStatus').textContent = 
+                    userReferrer !== '0x0000000000000000000000000000000000000000' ? '已绑定' : '未绑定';
+                
+                const userPhase = await mainContract.methods.getUserPhase(account).call();
+                document.getElementById('userPhase').textContent = 
+                    Number(userPhase) === 0 ? '新用户' : `阶段${userPhase}`;
+                
+                // 持仓信息
+                const holdInfo = await mainContract.methods.getUserHoldInfo(account).call();
+                document.getElementById('userThreshold').textContent = formatToken(holdInfo[0]);
+                document.getElementById('holdThreshold').textContent = formatToken(holdInfo[0]);
+                document.getElementById('holdStartTime').textContent = formatDate(holdInfo[1]);
+                document.getElementById('holdEndTime').textContent = formatDate(holdInfo[2]);
+                document.getElementById('holdQualified').textContent = holdInfo[3] ? '✅ 满足' : '❌ 不满足';
+                document.getElementById('qualified').textContent = holdInfo[3] ? '✅' : '❌';
+                
+                // DEX买入
+                const dexInfo = await mainContract.methods.getUserDEXBuyInfo(account).call();
+                document.getElementById('dexBuy').textContent = formatToken(dexInfo[0]);
+                
+                // 获取锁仓数据
+                await loadLockData();
+                
+            } catch (error) {
+                console.error('获取数据失败:', error);
+            } finally {
+                btn.classList.remove('spinning');
+                isLoading = false;
+            }
+        }
+        
+        async function loadLockData() {
+            try {
+                // 先从主合约获取锁仓合约地址
+                const lockAddr = await mainContract.methods.lockContract().call();
+                
+                if (lockAddr && lockAddr !== '0x0000000000000000000000000000000000000000') {
+                    lockContract = new web3.eth.Contract(LOCK_ABI, lockAddr);
+                    
+                    // 获取四个核心数据
+                    const lockInfo = await lockContract.methods.getAllLockInfo().call();
+                    
+                    // getAllLockInfo 返回:
+                    // 0: private30Total, 1: private30Released, 2: private40Total, 3: private40Released, 4: private40Active
+                    // 5: project30Total, 6: project30Released, 7: project40Total, 8: project40Released, 9: project40Active
+                    
+                    const private30Total = lockInfo[0];
+                    const private30Released = lockInfo[1];
+                    const private40Total = lockInfo[2];
+                    const private40Released = lockInfo[3];
+                    const project30Total = lockInfo[5];
+                    const project30Released = lockInfo[6];
+                    const project40Total = lockInfo[7];
+                    const project40Released = lockInfo[8];
+                    
+                    // 四个核心数据
+                    const privateLockTotal = BigInt(private30Total) + BigInt(private40Total);
+                    const privateReleased = BigInt(private30Released) + BigInt(private40Released);
+                    const projectLockTotal = BigInt(project30Total) + BigInt(project40Total);
+                    const projectReleased = BigInt(project30Released) + BigInt(project40Released);
+                    
+                    document.getElementById('privateLockTotal').textContent = formatToken(privateLockTotal.toString());
+                    document.getElementById('privateReleased').textContent = formatToken(privateReleased.toString());
+                    document.getElementById('projectLockTotal').textContent = formatToken(projectLockTotal.toString());
+                    document.getElementById('projectReleased').textContent = formatToken(projectReleased.toString());
+                    
+                    // 进度条
+                    document.getElementById('privateProgress').style.width = calcProgress(privateReleased.toString(), privateLockTotal.toString()) + '%';
+                    document.getElementById('projectProgress').style.width = calcProgress(projectReleased.toString(), projectLockTotal.toString()) + '%';
+                    
+                    // 详细数据
+                    document.getElementById('private30Total').textContent = formatToken(private30Total);
+                    document.getElementById('private30Released').textContent = formatToken(private30Released);
+                    document.getElementById('private40Total').textContent = formatToken(private40Total);
+                    document.getElementById('private40Released').textContent = formatToken(private40Released);
+                    document.getElementById('project30Total').textContent = formatToken(project30Total);
+                    document.getElementById('project30Released').textContent = formatToken(project30Released);
+                    document.getElementById('project40Total').textContent = formatToken(project40Total);
+                    document.getElementById('project40Released').textContent = formatToken(project40Released);
+                }
+            } catch (error) {
+                console.error('获取锁仓数据失败:', error);
+            }
+        }
+        
+        // ==================== 初始化 ====================
+        window.addEventListener('load', async () => {
+            if (typeof window.ethereum !== 'undefined') {
+                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                if (accounts.length > 0) {
+                    await connectWallet();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
