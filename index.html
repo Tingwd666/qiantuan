@@ -359,42 +359,231 @@ min-width: 140px;
 background: rgba(255,255,255,0.15);
 }
 
-/* TP / 手机 WebView：用实体按钮替代原生 select，避免下拉无法触发 change */
-.lang-chips {
+/* —— Stable 风格：顶栏 + 侧滑菜单 + 菜单内语言（无原生 select）—— */
+.app-topbar {
+position: sticky;
+top: 0;
+z-index: 100;
 display: flex;
-flex-wrap: wrap;
-justify-content: center;
 align-items: center;
-gap: 8px;
-margin: 10px 0 14px;
-padding: 0 4px;
+justify-content: space-between;
+padding: 10px 4px 14px;
+margin: -4px -4px 8px;
+background: linear-gradient(180deg, rgba(10, 14, 28, 0.94) 0%, rgba(10, 14, 28, 0.72) 100%);
+backdrop-filter: blur(12px);
+-webkit-backdrop-filter: blur(12px);
+border-bottom: 1px solid rgba(100, 200, 255, 0.12);
+box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+}
+
+.app-brand {
+display: flex;
+align-items: center;
+gap: 10px;
+font-weight: 700;
+font-size: 17px;
+letter-spacing: 0.06em;
+color: #fff;
+}
+
+.app-brand-mark {
+width: 36px;
+height: 36px;
+border-radius: 10px;
+background: linear-gradient(135deg, rgba(56, 189, 248, 0.35), rgba(139, 92, 246, 0.45));
+border: 1px solid rgba(147, 197, 253, 0.35);
+box-shadow: 0 0 20px rgba(56, 189, 248, 0.25);
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 18px;
+line-height: 1;
+}
+
+.app-brand-text {
+background: linear-gradient(135deg, #7dd3fc, #a78bfa, #c084fc);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+}
+
+.app-menu-btn {
+-webkit-tap-highlight-color: transparent;
+touch-action: manipulation;
+width: 44px;
+height: 44px;
+border-radius: 12px;
+border: 1px solid rgba(147, 197, 253, 0.25);
+background: rgba(255, 255, 255, 0.06);
+color: #e0f2fe;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+gap: 5px;
+cursor: pointer;
+box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.15);
+}
+
+.app-menu-btn span {
+display: block;
+width: 18px;
+height: 2px;
+border-radius: 1px;
+background: linear-gradient(90deg, #7dd3fc, #a78bfa);
+}
+
+.menu-overlay {
+position: fixed;
+inset: 0;
+z-index: 1000;
+background: rgba(5, 8, 18, 0.88);
+backdrop-filter: blur(8px);
+-webkit-backdrop-filter: blur(8px);
+display: flex;
+flex-direction: column;
+animation: menuIn 0.22s ease-out;
+}
+
+@keyframes menuIn {
+from { opacity: 0; transform: translateX(12px); }
+to { opacity: 1; transform: translateX(0); }
+}
+
+.menu-overlay-panel {
+flex: 1;
+max-width: 100%;
+width: min(100%, 400px);
+margin-left: auto;
+background: linear-gradient(165deg, rgba(22, 28, 48, 0.98) 0%, rgba(12, 16, 32, 0.99) 100%);
+border-left: 1px solid rgba(99, 102, 241, 0.25);
+box-shadow: -16px 0 48px rgba(0, 0, 0, 0.5);
+padding: 16px 18px 28px;
+overflow-y: auto;
 -webkit-overflow-scrolling: touch;
 }
 
-.lang-chip {
+.menu-overlay-head {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 28px;
+padding-bottom: 16px;
+border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.menu-overlay-title {
+font-size: 13px;
+font-weight: 600;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+color: rgba(165, 243, 252, 0.85);
+}
+
+.menu-close-btn {
+-webkit-tap-highlight-color: transparent;
+width: 40px;
+height: 40px;
+border-radius: 10px;
+border: 1px solid rgba(255, 255, 255, 0.12);
+background: rgba(255, 255, 255, 0.05);
+color: #fff;
+font-size: 22px;
+line-height: 1;
+cursor: pointer;
+}
+
+.menu-section-label {
+font-size: 11px;
+letter-spacing: 0.18em;
+text-transform: uppercase;
+color: rgba(255, 255, 255, 0.38);
+margin-bottom: 12px;
+}
+
+.lang-menu-trigger {
 -webkit-tap-highlight-color: transparent;
 touch-action: manipulation;
-min-height: 44px;
-min-width: 72px;
-padding: 10px 14px;
-border-radius: 10px;
-border: 1px solid rgba(255,255,255,0.25);
-background: rgba(255,255,255,0.08);
+width: 100%;
+display: flex;
+align-items: center;
+gap: 12px;
+padding: 14px 16px;
+border-radius: 14px;
+border: 1px solid rgba(147, 197, 253, 0.22);
+background: rgba(255, 255, 255, 0.04);
 color: #fff;
-font-size: 14px;
-font-weight: 500;
+font-size: 15px;
 cursor: pointer;
-outline: none;
+box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-.lang-chip.active {
-border-color: #667eea;
-background: rgba(102, 126, 234, 0.35);
-box-shadow: 0 0 0 1px rgba(102, 126, 234, 0.5);
+.lang-menu-trigger .lang-flag {
+font-size: 22px;
+line-height: 1;
 }
 
-.lang-chip:active {
-transform: scale(0.98);
+.lang-menu-trigger .lang-short {
+font-weight: 700;
+letter-spacing: 0.08em;
+min-width: 36px;
+color: #a5f3fc;
+}
+
+.lang-menu-trigger .lang-chevron {
+margin-left: auto;
+font-size: 12px;
+color: rgba(255, 255, 255, 0.45);
+transition: transform 0.2s;
+}
+
+.lang-menu-trigger.open .lang-chevron {
+transform: rotate(180deg);
+}
+
+.lang-menu-list {
+display: none;
+margin-top: 10px;
+border-radius: 14px;
+overflow: hidden;
+border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.lang-menu-list.open {
+display: block;
+}
+
+.lang-menu-row {
+-webkit-tap-highlight-color: transparent;
+touch-action: manipulation;
+width: 100%;
+display: flex;
+align-items: center;
+gap: 12px;
+padding: 14px 16px;
+border: none;
+border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+background: rgba(15, 20, 40, 0.95);
+color: #fff;
+font-size: 15px;
+text-align: left;
+cursor: pointer;
+}
+
+.lang-menu-row:last-child {
+border-bottom: none;
+}
+
+.lang-menu-row.active {
+background: linear-gradient(90deg, rgba(99, 102, 241, 0.28), rgba(56, 189, 248, 0.12));
+box-shadow: inset 3px 0 0 #7dd3fc;
+}
+
+.menu-hint {
+margin-top: 24px;
+font-size: 12px;
+line-height: 1.6;
+color: rgba(255, 255, 255, 0.38);
 }
 
 .btn:hover {
@@ -754,6 +943,41 @@ flex-wrap: wrap;
 </head>
 <body>
 <div class="container">
+<header class="app-topbar">
+<div class="app-brand">
+<span class="app-brand-mark" aria-hidden="true">◆</span>
+<span class="app-brand-text" data-i18n="tokenName">小翼龙</span>
+</div>
+<button type="button" class="app-menu-btn" onclick="toggleAppMenu(true)" aria-label="Menu">
+<span></span><span></span><span></span>
+</button>
+</header>
+
+<div id="menuOverlay" class="menu-overlay hidden" role="dialog" aria-modal="true" aria-label="Menu" onclick="toggleAppMenu(false)">
+<div class="menu-overlay-panel" onclick="event.stopPropagation()">
+<div class="menu-overlay-head">
+<span class="menu-overlay-title" data-i18n="menuTitle">菜单</span>
+<button type="button" class="menu-close-btn" onclick="toggleAppMenu(false)" aria-label="Close">×</button>
+</div>
+<p class="menu-section-label" data-i18n="languageSection">语言</p>
+<button type="button" class="lang-menu-trigger" id="langMenuTrigger" onclick="toggleLangPanel()">
+<span class="lang-flag" id="langTriggerFlag">🌐</span>
+<span class="lang-short" id="langTriggerShort">TW</span>
+<span style="flex:1;text-align:left;opacity:0.85;font-size:13px;" id="langTriggerLabel">繁體中文</span>
+<span class="lang-chevron">▼</span>
+</button>
+<div class="lang-menu-list" id="langMenuList">
+<button type="button" class="lang-menu-row" data-lang="zh-TW"><span>🇹🇼</span><span>繁體中文</span><span style="margin-left:auto;opacity:0.5;font-size:12px;">TW</span></button>
+<button type="button" class="lang-menu-row" data-lang="en"><span>🇬🇧</span><span>English</span><span style="margin-left:auto;opacity:0.5;font-size:12px;">EN</span></button>
+<button type="button" class="lang-menu-row" data-lang="ja"><span>🇯🇵</span><span>日本語</span><span style="margin-left:auto;opacity:0.5;font-size:12px;">JP</span></button>
+<button type="button" class="lang-menu-row" data-lang="ko"><span>🇰🇷</span><span>한국어</span><span style="margin-left:auto;opacity:0.5;font-size:12px;">KR</span></button>
+<button type="button" class="lang-menu-row" data-lang="vi"><span>🇻🇳</span><span>Tiếng Việt</span><span style="margin-left:auto;opacity:0.5;font-size:12px;">VI</span></button>
+<button type="button" class="lang-menu-row" data-lang="th"><span>🇹🇭</span><span>ไทย</span><span style="margin-left:auto;opacity:0.5;font-size:12px;">TH</span></button>
+</div>
+<p class="menu-hint" data-i18n="menuLangHint">选择语言后界面将立即切换。若 TokenPocket 内无反应，请尝试刷新页面。</p>
+</div>
+</div>
+
 <div class="top-banner">
 <img src="150659f2ce7580b3be6b695195574c44_720.jpg" alt="banner">
 </div>
@@ -761,15 +985,6 @@ flex-wrap: wrap;
 <div class="status-bar">
 <div class="status-dot" id="statusDot"></div>
 <span class="status-text" id="statusText" data-i18n="notConnected">未连接</span>
-</div>
-
-<div class="lang-chips" id="langChips" role="group" aria-label="Language">
-<button type="button" class="lang-chip" data-lang="zh-TW">中文</button>
-<button type="button" class="lang-chip" data-lang="en">English</button>
-<button type="button" class="lang-chip" data-lang="ja">日本語</button>
-<button type="button" class="lang-chip" data-lang="ko">한국어</button>
-<button type="button" class="lang-chip" data-lang="vi">Tiếng Việt</button>
-<button type="button" class="lang-chip" data-lang="th">ไทย</button>
 </div>
 
 <div id="beforeConnect">
@@ -1002,6 +1217,9 @@ tokenName: '小翼龍',
 tokenSlogan: '生態社區共治',
 notConnected: '未連接',
 selectLanguage: '選擇語言',
+menuTitle: '選單',
+languageSection: '語言',
+menuLangHint: '選擇語言後介面將立即切換。若 TokenPocket 內無反應，請嘗試重新整理頁面。',
 connectWallet: '連接錢包',
 disconnectWallet: '斷開連接',
 tabHome: '首頁',
@@ -1087,6 +1305,9 @@ tokenName: 'XYL',
 tokenSlogan: 'Ecological Community Governance',
 notConnected: 'Not Connected',
 selectLanguage: 'Language',
+menuTitle: 'Menu',
+languageSection: 'Language',
+menuLangHint: 'The interface updates immediately. If nothing changes in TokenPocket, try refreshing the page.',
 connectWallet: 'Connect Wallet',
 disconnectWallet: 'Disconnect',
 tabHome: 'Home',
@@ -1169,6 +1390,9 @@ operationError: 'Operation Error'
 ja: {
 pageTitle: 'XYL トークン',
 selectLanguage: '言語',
+menuTitle: 'メニュー',
+languageSection: '言語',
+menuLangHint: '言語を選ぶとすぐに反映されます。TokenPocket で変化がない場合はページを再読み込みしてください。',
 connectWallet: 'ウォレット接続',
 disconnectWallet: '切断',
 tabHome: 'ホーム',
@@ -1245,6 +1469,9 @@ operationError: '操作エラー'
 ko: {
 pageTitle: 'XYL 토큰',
 selectLanguage: '언어',
+menuTitle: '메뉴',
+languageSection: '언어',
+menuLangHint: '언어를 선택하면 즉시 적용됩니다. TokenPocket에서 반응이 없으면 새로고침하세요.',
 connectWallet: '지갑 연결',
 disconnectWallet: '연결 해제',
 tabHome: '홈',
@@ -1321,6 +1548,9 @@ operationError: '작업 오류'
 vi: {
 pageTitle: 'XYL Token',
 selectLanguage: 'Ngôn ngữ',
+menuTitle: 'Menu',
+languageSection: 'Ngôn ngữ',
+menuLangHint: 'Giao diện cập nhật ngay. Nếu TokenPocket không đổi, hãy tải lại trang.',
 connectWallet: 'Kết nối Ví',
 disconnectWallet: 'Ngắt kết nối',
 tabHome: 'Trang chủ',
@@ -1397,6 +1627,9 @@ operationError: 'Lỗi thao tác'
 th: {
 pageTitle: 'XYL Token',
 selectLanguage: 'ภาษา',
+menuTitle: 'เมนู',
+languageSection: 'ภาษา',
+menuLangHint: 'เลือกแล้วหน้าจอเปลี่ยนทันที หาก TokenPocket ไม่เปลี่ยน ลองรีเฟรช',
 connectWallet: 'เชื่อมต่อกระเป๋า',
 disconnectWallet: 'ตัดการเชื่อมต่อ',
 tabHome: 'หน้าแรก',
@@ -1490,12 +1723,57 @@ const langData = I18N[currentLang] || I18N['zh-TW'];
 return langData[key] || key;
 }
 
-function updateLangChipsHighlight() {
-var chips = document.querySelectorAll('.lang-chip');
-for (var i = 0; i < chips.length; i++) {
-var btn = chips[i];
-var code = btn.getAttribute('data-lang');
-btn.classList.toggle('active', code === currentLang);
+var LANG_UI = {
+'zh-TW': { short: 'TW', flag: '🇹🇼', label: '繁體中文' },
+'en': { short: 'EN', flag: '🇬🇧', label: 'English' },
+'ja': { short: 'JP', flag: '🇯🇵', label: '日本語' },
+'ko': { short: 'KR', flag: '🇰🇷', label: '한국어' },
+'vi': { short: 'VI', flag: '🇻🇳', label: 'Tiếng Việt' },
+'th': { short: 'TH', flag: '🇹🇭', label: 'ไทย' }
+};
+
+function collapseLangPanel() {
+var list = document.getElementById('langMenuList');
+var tr = document.getElementById('langMenuTrigger');
+if (list) list.classList.remove('open');
+if (tr) tr.classList.remove('open');
+}
+
+function toggleLangPanel() {
+var list = document.getElementById('langMenuList');
+var tr = document.getElementById('langMenuTrigger');
+if (!list || !tr) return;
+list.classList.toggle('open');
+tr.classList.toggle('open');
+}
+
+function toggleAppMenu(open) {
+var el = document.getElementById('menuOverlay');
+if (!el) return;
+if (open === true) {
+el.classList.remove('hidden');
+document.body.style.overflow = 'hidden';
+return;
+}
+if (open === false) {
+el.classList.add('hidden');
+document.body.style.overflow = '';
+collapseLangPanel();
+}
+}
+
+function updateLangMenuUI() {
+var meta = LANG_UI[currentLang] || LANG_UI['zh-TW'];
+var ff = document.getElementById('langTriggerFlag');
+var fs = document.getElementById('langTriggerShort');
+var fl = document.getElementById('langTriggerLabel');
+if (ff) ff.textContent = meta.flag;
+if (fs) fs.textContent = meta.short;
+if (fl) fl.textContent = meta.label;
+var rows = document.querySelectorAll('.lang-menu-row');
+for (var i = 0; i < rows.length; i++) {
+var row = rows[i];
+row.classList.toggle('active', row.getAttribute('data-lang') === currentLang);
 }
 }
 
@@ -1504,7 +1782,9 @@ if (!lang || !I18N[lang]) return;
 currentLang = lang;
 safeStorageSet(LANG_STORAGE_KEY, lang);
 applyTranslations();
-updateLangChipsHighlight();
+updateLangMenuUI();
+collapseLangPanel();
+toggleAppMenu(false);
 }
 
 function applyTranslations() {
@@ -2128,12 +2408,12 @@ function translateError(err) {
 }
 
 window.addEventListener('load', async () => {
-var chipsWrap = document.getElementById('langChips');
-if (chipsWrap) {
-chipsWrap.addEventListener('click', function (e) {
-var t = e.target && e.target.closest ? e.target.closest('.lang-chip') : null;
-if (!t || !t.getAttribute) return;
-var code = t.getAttribute('data-lang');
+var langList = document.getElementById('langMenuList');
+if (langList) {
+langList.addEventListener('click', function (e) {
+var row = e.target && e.target.closest ? e.target.closest('.lang-menu-row') : null;
+if (!row) return;
+var code = row.getAttribute('data-lang');
 if (code) setLanguage(code);
 });
 }
@@ -2148,7 +2428,7 @@ if (savedLang && I18N[savedLang]) {
 currentLang = savedLang;
 }
 applyTranslations();
-updateLangChipsHighlight();
+updateLangMenuUI();
 
 if (typeof window.ethereum !== 'undefined') {
 const accounts = await window.ethereum.request({ method: 'eth_accounts' });
