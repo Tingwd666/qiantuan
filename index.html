@@ -359,6 +359,44 @@ min-width: 140px;
 background: rgba(255,255,255,0.15);
 }
 
+/* TP / 手机 WebView：用实体按钮替代原生 select，避免下拉无法触发 change */
+.lang-chips {
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+align-items: center;
+gap: 8px;
+margin: 10px 0 14px;
+padding: 0 4px;
+-webkit-overflow-scrolling: touch;
+}
+
+.lang-chip {
+-webkit-tap-highlight-color: transparent;
+touch-action: manipulation;
+min-height: 44px;
+min-width: 72px;
+padding: 10px 14px;
+border-radius: 10px;
+border: 1px solid rgba(255,255,255,0.25);
+background: rgba(255,255,255,0.08);
+color: #fff;
+font-size: 14px;
+font-weight: 500;
+cursor: pointer;
+outline: none;
+}
+
+.lang-chip.active {
+border-color: #667eea;
+background: rgba(102, 126, 234, 0.35);
+box-shadow: 0 0 0 1px rgba(102, 126, 234, 0.5);
+}
+
+.lang-chip:active {
+transform: scale(0.98);
+}
+
 .btn:hover {
 transform: translateY(-2px);
 box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -725,25 +763,18 @@ flex-wrap: wrap;
 <span class="status-text" id="statusText" data-i18n="notConnected">未连接</span>
 </div>
 
+<div class="lang-chips" id="langChips" role="group" aria-label="Language">
+<button type="button" class="lang-chip" data-lang="zh-TW">中文</button>
+<button type="button" class="lang-chip" data-lang="en">English</button>
+<button type="button" class="lang-chip" data-lang="ja">日本語</button>
+<button type="button" class="lang-chip" data-lang="ko">한국어</button>
+<button type="button" class="lang-chip" data-lang="vi">Tiếng Việt</button>
+<button type="button" class="lang-chip" data-lang="th">ไทย</button>
+</div>
+
 <div id="beforeConnect">
 <div class="btn-group">
-<button class="btn btn-lang" onclick="toggleLangSelector()">
-<span data-i18n="selectLanguage">选择语言</span>
-<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 4px;">
-<path d="M6 9l6 6 6-6"/>
-</svg>
-</button>
 <button class="btn btn-primary" onclick="connectWallet()" data-i18n="connectWallet">连接钱包</button>
-</div>
-<div id="langSelectorDropdown" class="lang-dropdown hidden">
-<select id="langSelect">
-<option value="zh-TW">中文</option>
-<option value="en">English</option>
-<option value="ja">日本語</option>
-<option value="ko">한국어</option>
-<option value="vi">Tiếng Việt</option>
-<option value="th">ไทย</option>
-</select>
 </div>
 <div class="wallet-section" id="walletSection"></div>
 
@@ -1459,26 +1490,21 @@ const langData = I18N[currentLang] || I18N['zh-TW'];
 return langData[key] || key;
 }
 
-function toggleLangSelector() {
-const dropdown = document.getElementById('langSelectorDropdown');
-dropdown.classList.toggle('hidden');
+function updateLangChipsHighlight() {
+var chips = document.querySelectorAll('.lang-chip');
+for (var i = 0; i < chips.length; i++) {
+var btn = chips[i];
+var code = btn.getAttribute('data-lang');
+btn.classList.toggle('active', code === currentLang);
+}
 }
 
 function setLanguage(lang) {
 if (!lang || !I18N[lang]) return;
 currentLang = lang;
 safeStorageSet(LANG_STORAGE_KEY, lang);
-var sel = document.getElementById('langSelect');
-if (sel) sel.value = lang;
 applyTranslations();
-}
-
-function onLangSelectPicked() {
-var sel = document.getElementById('langSelect');
-if (!sel) return;
-setLanguage(sel.value);
-var dd = document.getElementById('langSelectorDropdown');
-if (dd) dd.classList.add('hidden');
+updateLangChipsHighlight();
 }
 
 function applyTranslations() {
@@ -2102,10 +2128,14 @@ function translateError(err) {
 }
 
 window.addEventListener('load', async () => {
-var sel = document.getElementById('langSelect');
-if (sel) {
-sel.addEventListener('change', onLangSelectPicked);
-sel.addEventListener('input', onLangSelectPicked);
+var chipsWrap = document.getElementById('langChips');
+if (chipsWrap) {
+chipsWrap.addEventListener('click', function (e) {
+var t = e.target && e.target.closest ? e.target.closest('.lang-chip') : null;
+if (!t || !t.getAttribute) return;
+var code = t.getAttribute('data-lang');
+if (code) setLanguage(code);
+});
 }
 var params = new URLSearchParams(window.location.search);
 var urlLang = params.get('lang');
@@ -2116,11 +2146,9 @@ safeStorageSet(LANG_STORAGE_KEY, urlLang);
 const savedLang = safeStorageGet(LANG_STORAGE_KEY);
 if (savedLang && I18N[savedLang]) {
 currentLang = savedLang;
-if (sel) sel.value = savedLang;
-} else if (sel) {
-sel.value = 'zh-TW';
 }
 applyTranslations();
+updateLangChipsHighlight();
 
 if (typeof window.ethereum !== 'undefined') {
 const accounts = await window.ethereum.request({ method: 'eth_accounts' });
