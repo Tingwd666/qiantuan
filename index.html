@@ -736,7 +736,7 @@ flex-wrap: wrap;
 <button class="btn btn-primary" onclick="connectWallet()" data-i18n="connectWallet">连接钱包</button>
 </div>
 <div id="langSelectorDropdown" class="lang-dropdown hidden">
-<select id="langSelect" onchange="setLanguage(this.value); applyTranslations(); document.getElementById('langSelectorDropdown').classList.add('hidden');">
+<select id="langSelect">
 <option value="zh-TW">中文</option>
 <option value="en">English</option>
 <option value="ja">日本語</option>
@@ -1441,7 +1441,18 @@ operationError: 'ข้อผิดพลาดการทำงาน'
 }
 };
 
-let currentLang = localStorage.getItem('xyl_lang') || 'zh-TW';
+const LANG_STORAGE_KEY = 'xyl_lang';
+function safeStorageGet(key) {
+try { return localStorage.getItem(key); } catch (e) {}
+try { return sessionStorage.getItem(key); } catch (e2) {}
+return null;
+}
+function safeStorageSet(key, val) {
+try { localStorage.setItem(key, val); return; } catch (e) {}
+try { sessionStorage.setItem(key, val); } catch (e2) {}
+}
+
+let currentLang = safeStorageGet(LANG_STORAGE_KEY) || 'zh-TW';
 
 function t(key) {
 const langData = I18N[currentLang] || I18N['zh-TW'];
@@ -1454,10 +1465,20 @@ dropdown.classList.toggle('hidden');
 }
 
 function setLanguage(lang) {
+if (!lang || !I18N[lang]) return;
 currentLang = lang;
-localStorage.setItem('xyl_lang', lang);
-document.getElementById('langSelect').value = lang;
+safeStorageSet(LANG_STORAGE_KEY, lang);
+var sel = document.getElementById('langSelect');
+if (sel) sel.value = lang;
 applyTranslations();
+}
+
+function onLangSelectPicked() {
+var sel = document.getElementById('langSelect');
+if (!sel) return;
+setLanguage(sel.value);
+var dd = document.getElementById('langSelectorDropdown');
+if (dd) dd.classList.add('hidden');
 }
 
 function applyTranslations() {
@@ -2081,12 +2102,23 @@ function translateError(err) {
 }
 
 window.addEventListener('load', async () => {
-const savedLang = localStorage.getItem('xyl_lang');
-if (savedLang) {
+var sel = document.getElementById('langSelect');
+if (sel) {
+sel.addEventListener('change', onLangSelectPicked);
+sel.addEventListener('input', onLangSelectPicked);
+}
+var params = new URLSearchParams(window.location.search);
+var urlLang = params.get('lang');
+if (urlLang && I18N[urlLang]) {
+currentLang = urlLang;
+safeStorageSet(LANG_STORAGE_KEY, urlLang);
+}
+const savedLang = safeStorageGet(LANG_STORAGE_KEY);
+if (savedLang && I18N[savedLang]) {
 currentLang = savedLang;
-document.getElementById('langSelect').value = savedLang;
-} else {
-document.getElementById('langSelect').value = 'zh-TW';
+if (sel) sel.value = savedLang;
+} else if (sel) {
+sel.value = 'zh-TW';
 }
 applyTranslations();
 
