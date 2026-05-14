@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; connect-src 'self' https://cdn.jsdelivr.net https://bsc-dataseed.binance.org https://bsc-dataseed1.binance.org https://bsc-dataseed2.binance.org https://bsc-dataseed3.binance.org https://bsc-dataseed4.binance.org https://*.binance.org https://rpc.ankr.com https://*.infura.io https://*.nodereal.io https://bsc.publicnode.com https://1rpc.io wss://*.binance.org wss://bsc-ws-node.nariox.org wss://*.binance.dev; upgrade-insecure-requests">
 <title>Tiny Winged Dragon Token</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'></text></svg>">
 <style>
@@ -212,6 +213,29 @@ color: #00d26a;
 
 .lock-card.project .lock-value {
 color: #ffc107;
+}
+
+.progress-block {
+margin-top: 14px;
+}
+
+.progress-track {
+height: 10px;
+background: rgba(255,255,255,0.1);
+border-radius: 999px;
+overflow: hidden;
+}
+
+.progress-fill {
+height: 100%;
+width: 0%;
+background: linear-gradient(90deg, #667eea, #00d26a);
+border-radius: 999px;
+transition: width 0.4s ease;
+}
+
+.progress-fill-total {
+background: linear-gradient(90deg, #764ba2, #f093fb);
 }
 
 .progress-bar {
@@ -1037,18 +1061,18 @@ flex-wrap: wrap;
 </div>
 <div class="tier-row">
 <span class="tier-label" data-i18n="tierOne">一档</span>
-<span class="tier-superior" data-i18n="threshold300M">300万</span>
-<span class="tier-subordinate" data-i18n="threshold50M">50万</span>
+<span class="tier-superior" id="tierUp0">--</span>
+<span class="tier-subordinate" id="tierDown0">--</span>
 </div>
 <div class="tier-row">
 <span class="tier-label" data-i18n="tierTwo">二档</span>
-<span class="tier-superior" data-i18n="threshold150M">150万</span>
-<span class="tier-subordinate" data-i18n="threshold80M">80万</span>
+<span class="tier-superior" id="tierUp1">--</span>
+<span class="tier-subordinate" id="tierDown1">--</span>
 </div>
 <div class="tier-row">
 <span class="tier-label" data-i18n="tierThree">三档</span>
-<span class="tier-superior" data-i18n="threshold80M2">80万</span>
-<span class="tier-subordinate" data-i18n="threshold10M">10万</span>
+<span class="tier-superior" id="tierUp2">--</span>
+<span class="tier-subordinate" id="tierDown2">--</span>
 </div>
 </div>
 </div>
@@ -1057,12 +1081,32 @@ flex-wrap: wrap;
 <div class="card">
 <div class="card-title" data-i18n="contractData">合约数据</div>
 <div class="data-row">
+<span class="data-label" data-i18n="chainOnPhase">链上当前阶段</span>
+<span class="data-value" id="homeChainPhase">--</span>
+</div>
+<div class="data-row">
 <span class="data-label" data-i18n="burnedAmount">销毁总量</span>
 <span class="data-value" id="burnedAmount">--</span>
 </div>
 <div class="data-row">
 <span class="data-label" data-i18n="circulatingSupply">流通供应</span>
 <span class="data-value" id="circulating">--</span>
+</div>
+<div class="progress-block">
+<div class="data-row" style="margin-bottom: 6px;">
+<span class="data-label" data-i18n="burnProgressThisPhase">本阶段销毁进度</span>
+<span class="data-value" id="burnProgressPhaseText">--</span>
+</div>
+<div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="burnProgressPhaseTrack">
+<div class="progress-fill" id="burnProgressPhaseFill"></div>
+</div>
+<div class="data-row" style="margin-top: 12px; margin-bottom: 6px;">
+<span class="data-label" data-i18n="burnProgressTotal">全周期销毁进度</span>
+<span class="data-value" id="burnProgressTotalText">--</span>
+</div>
+<div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="burnProgressTotalTrack">
+<div class="progress-fill progress-fill-total" id="burnProgressTotalFill"></div>
+</div>
 </div>
 </div>
 </div>
@@ -1131,7 +1175,7 @@ flex-wrap: wrap;
 </div>
 
 <div id="claimLog" style="margin-top: 16px; display: none;">
-<div class="card-title" style="font-size: 13px;">操作日志</div>
+<div class="card-title" style="font-size: 13px;" data-i18n="claimLogTitle">操作日志</div>
 <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;" id="logContent"></div>
 </div>
 </div>
@@ -1170,6 +1214,14 @@ flex-wrap: wrap;
                         <span class="data-label" data-i18n="userPhase">用户阶段</span>
                         <span class="data-value" id="userPhase">--</span>
                     </div>
+                    <div class="data-row">
+                        <span class="data-label" data-i18n="referrerStatusLabel">推荐人</span>
+                        <span class="data-value" id="referrerStatus">--</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label" data-i18n="holdQualifiedLabel">持仓达标</span>
+                        <span class="data-value" id="holdQualified">--</span>
+                    </div>
                 </div>
                 
 <div class="btn-group">
@@ -1198,15 +1250,17 @@ flex-wrap: wrap;
 </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js" integrity="sha384-uDUzAob8VRybYi68YL5W/y5Uel6PtqYSI0YHiTQB400WGPc/TVqL2dHYDkGKdBnw" crossorigin="anonymous"></script>
 <script>
+/**
+ * MAIN_CONTRACT：主代币（代理）部署上线后改为实际地址（必填）。
+ * LOCK_CONTRACT：锁仓数据默认从链上 mainContract.lockContract() 读取；仅当链上尚未写入锁仓地址、需要临时调试时，可填此处作为回退（一般保持 0 即可）。
+ */
 const CONFIG = {
 BSC_RPC: "https://bsc-dataseed.binance.org/",
 CHAIN_ID: 56,
-
 MAIN_CONTRACT: "0x0000000000000000000000000000000000000000",
 LOCK_CONTRACT: "0x0000000000000000000000000000000000000000",
-
 TOKEN_DECIMALS: 18
 };
 
@@ -1297,7 +1351,62 @@ downline: '下級',
 tierClaim: '檔',
 claimSuccess: '領取成功',
 claimFailed: '失敗',
-operationError: '操作錯誤'
+operationError: '操作錯誤',
+chainOnPhase: '鏈上當前階段',
+phaseEndedBadge: '（銷毀已達標，待治理進入下階段）',
+referrerStatusLabel: '推薦人',
+holdQualifiedLabel: '持倉達標',
+referrerBound: '已綁定',
+referrerNotBound: '未綁定',
+holdYes: '✅ 滿足',
+holdNo: '❌ 未滿足',
+userPhaseNewLabel: '新用戶',
+claimLogTitle: '操作日誌',
+refreshModalTitle: '刷新信息',
+logTryClaimFmt: '嘗試領取 {addr} 第{tier}檔',
+logTierOkFmt: '✓ 第{tier}檔 領取成功',
+logTierFailFmt: '✗ 第{tier}檔 失敗: {msg}',
+logDoneFmt: '完成！成功: {ok}, 失敗: {fail}',
+logPhaseLineFmt: '當前階段: {phase}, 下級數量: {count}',
+userRejectConnect: '用戶取消連接',
+walletDenied: '未授權錢包',
+invalidAddress: '請輸入有效的錢包地址',
+userPhaseFmt: '階段{phase}',
+burnProgressThisPhase: '本階段銷毀進度',
+burnProgressTotal: '全週期銷毀進度',
+burnProgressFmt: '{cur} / {target} · {pct}%',
+err24hHold: '24小時持倉未滿足',
+errTierTimer: '檔位持倉計時未開始',
+errTierClaimed: '該檔位已領取',
+errDownHold: '下級持倉不足',
+errUpHold: '上級持倉不足',
+errHoldQualified: '持倉不達標',
+errAlreadyBound: '已綁定過推薦人',
+errInvalidReferrer: '無效推薦人',
+errSelfRef: '不能綁定自己為推薦人',
+errNoBuy: '下級未在 DEX 買入',
+errTooSoon: '操作過於頻繁',
+errInvalidTier: '無效檔位',
+errNotReferrer: '不是該下級的推薦人',
+errOldUserClear: '老用戶需先清倉',
+errAlreadyClaimed: '已領取過',
+errNotQualified: '不符合條件',
+errInsufficientBalance: '餘額不足',
+errTransferFailed: '轉帳失敗',
+errUnauthorized: '未授權',
+errAlreadySigned: '已簽名',
+errNotEnoughSigs: '簽名數量不足',
+errInvalidAddress: '無效地址',
+errUserRejected: '用戶取消簽名',
+errRevertFmt: '合約退回: {reason}',
+errUnknownFmt: '{detail}',
+logErrorFmt: '錯誤: {msg}',
+wrongNetworkStrict: '網路不正確：請在錢包中切換到 BSC 主網後再連接',
+contractNotConfigured: '主合約地址尚未設定，無法讀取鏈上數據（部署後請填 CONFIG.MAIN_CONTRACT）',
+zeroAddressNotAllowed: '不能使用零地址',
+cannotBindSelf: '不能綁定自己為推薦人',
+txPending: '交易已提交，等待鏈上確認…',
+duplicateActionWait: '請等待上一筆交易完成後再試'
 },
 en: {
 pageTitle: 'XYL Token',
@@ -1385,7 +1494,62 @@ downline: 'downline',
 tierClaim: 'tier',
 claimSuccess: 'Claim success',
 claimFailed: 'Failed',
-operationError: 'Operation Error'
+operationError: 'Operation Error',
+chainOnPhase: 'On-chain phase',
+phaseEndedBadge: '(burn target met, pending next phase)',
+referrerStatusLabel: 'Referrer',
+holdQualifiedLabel: 'Hold qualified',
+referrerBound: 'Bound',
+referrerNotBound: 'Not bound',
+holdYes: '✅ Yes',
+holdNo: '❌ No',
+userPhaseNewLabel: 'New user',
+claimLogTitle: 'Activity log',
+refreshModalTitle: 'Refresh info',
+logTryClaimFmt: 'Claiming {addr} tier {tier}',
+logTierOkFmt: '✓ Tier {tier} success',
+logTierFailFmt: '✗ Tier {tier} failed: {msg}',
+logDoneFmt: 'Done. OK: {ok}, failed: {fail}',
+logPhaseLineFmt: 'Phase: {phase}, downlines: {count}',
+userRejectConnect: 'User rejected connection',
+walletDenied: 'Wallet not authorized',
+invalidAddress: 'Enter a valid wallet address',
+userPhaseFmt: 'Phase {phase}',
+burnProgressThisPhase: 'Burn progress (this phase)',
+burnProgressTotal: 'Burn progress (full cycle)',
+burnProgressFmt: '{cur} / {target} · {pct}%',
+err24hHold: '24h hold requirement not met',
+errTierTimer: 'Tier hold timer not started',
+errTierClaimed: 'This tier reward already claimed',
+errDownHold: 'Downline hold insufficient',
+errUpHold: 'Upline hold insufficient',
+errHoldQualified: 'Hold not qualified',
+errAlreadyBound: 'Referrer already bound',
+errInvalidReferrer: 'Invalid referrer',
+errSelfRef: 'Cannot bind self as referrer',
+errNoBuy: 'Downline has no qualifying DEX buy',
+errTooSoon: 'Action too soon',
+errInvalidTier: 'Invalid tier',
+errNotReferrer: 'Not the downline referrer',
+errOldUserClear: 'Legacy users must clear positions first',
+errAlreadyClaimed: 'Already claimed',
+errNotQualified: 'Not qualified',
+errInsufficientBalance: 'Insufficient balance',
+errTransferFailed: 'Transfer failed',
+errUnauthorized: 'Unauthorized',
+errAlreadySigned: 'Already signed',
+errNotEnoughSigs: 'Not enough signatures',
+errInvalidAddress: 'Invalid address',
+errUserRejected: 'User rejected signature',
+errRevertFmt: 'Reverted: {reason}',
+errUnknownFmt: '{detail}',
+logErrorFmt: 'Error: {msg}',
+wrongNetworkStrict: 'Wrong network: switch to BSC in your wallet, then reconnect.',
+contractNotConfigured: 'Main contract address is not set; on-chain data unavailable (set CONFIG.MAIN_CONTRACT after deploy).',
+zeroAddressNotAllowed: 'Zero address is not allowed.',
+cannotBindSelf: 'You cannot bind yourself as referrer.',
+txPending: 'Transaction submitted, waiting for confirmation…',
+duplicateActionWait: 'Please wait for the previous transaction to finish.'
 },
 ja: {
 pageTitle: 'XYL トークン',
@@ -1464,7 +1628,62 @@ downline: '下位者',
 tierClaim: 'グレード',
 claimSuccess: '請求成功',
 claimFailed: '失敗',
-operationError: '操作エラー'
+operationError: '操作エラー',
+chainOnPhase: 'オンチェーン段階',
+phaseEndedBadge: '（焼却目標達成、次段階待ち）',
+referrerStatusLabel: '紹介者',
+holdQualifiedLabel: '保有条件',
+referrerBound: '紐付け済',
+referrerNotBound: '未紐付け',
+holdYes: '✅ 達成',
+holdNo: '❌ 未達',
+userPhaseNewLabel: '新規ユーザー',
+claimLogTitle: 'ログ',
+refreshModalTitle: '更新情報',
+logTryClaimFmt: '{addr} ティア{tier} を請求',
+logTierOkFmt: '✓ ティア{tier} 成功',
+logTierFailFmt: '✗ ティア{tier} 失敗: {msg}',
+logDoneFmt: '完了 成功:{ok} 失敗:{fail}',
+logPhaseLineFmt: '段階:{phase} 下位:{count}',
+userRejectConnect: '接続がキャンセルされました',
+walletDenied: 'ウォレット未承認',
+invalidAddress: '有効なアドレスを入力してください',
+userPhaseFmt: '段階{phase}',
+burnProgressThisPhase: '現段階バーン進捗',
+burnProgressTotal: '全期間バーン進捗',
+burnProgressFmt: '{cur} / {target} · {pct}%',
+err24hHold: '24時間保有条件を満たしていません',
+errTierTimer: 'ティア保有タイマー未開始',
+errTierClaimed: 'このティアは既に請求済み',
+errDownHold: '下位の保有量が不足',
+errUpHold: '上位の保有量が不足',
+errHoldQualified: '保有が不十分',
+errAlreadyBound: '紹介者は既に登録済み',
+errInvalidReferrer: '無効な紹介者',
+errSelfRef: '自分を紹介者にできません',
+errNoBuy: '下位に条件を満たすDEX買いがありません',
+errTooSoon: '操作が早すぎます',
+errInvalidTier: '無効なティア',
+errNotReferrer: 'この下位の紹介者ではありません',
+errOldUserClear: 'レガシーユーザーは先にポジション整理が必要',
+errAlreadyClaimed: '既に請求済み',
+errNotQualified: '条件未達',
+errInsufficientBalance: '残高不足',
+errTransferFailed: '転送失敗',
+errUnauthorized: '未承認',
+errAlreadySigned: '署名済み',
+errNotEnoughSigs: '署名数不足',
+errInvalidAddress: '無効なアドレス',
+errUserRejected: '署名が拒否されました',
+errRevertFmt: 'リバート: {reason}',
+errUnknownFmt: '{detail}',
+logErrorFmt: 'エラー: {msg}',
+wrongNetworkStrict: 'ネットワークが正しくありません。ウォレットでBSCに切り替えてから再接続してください。',
+contractNotConfigured: 'メインコントラクトアドレスが未設定のため、オンチェーンデータを取得できません（デプロイ後にCONFIG.MAIN_CONTRACTを設定）。',
+zeroAddressNotAllowed: 'ゼロアドレスは使用できません。',
+cannotBindSelf: '自分自身を紹介者にすることはできません。',
+txPending: 'トランザクションを送信しました。確認を待っています…',
+duplicateActionWait: '前のトランザクションが完了するまでお待ちください。'
 },
 ko: {
 pageTitle: 'XYL 토큰',
@@ -1543,7 +1762,62 @@ downline: '하위',
 tierClaim: '등급',
 claimSuccess: '청구 성공',
 claimFailed: '실패',
-operationError: '작업 오류'
+operationError: '작업 오류',
+chainOnPhase: '온체인 단계',
+phaseEndedBadge: '(소각 목표 달성, 다음 단계 대기)',
+referrerStatusLabel: '추천인',
+holdQualifiedLabel: '보유 자격',
+referrerBound: '연결됨',
+referrerNotBound: '미연결',
+holdYes: '✅ 충족',
+holdNo: '❌ 미충족',
+userPhaseNewLabel: '신규',
+claimLogTitle: '로그',
+refreshModalTitle: '새로고침',
+logTryClaimFmt: '{addr} {tier}단 청구',
+logTierOkFmt: '✓ {tier}단 성공',
+logTierFailFmt: '✗ {tier}단 실패: {msg}',
+logDoneFmt: '완료 성공:{ok} 실패:{fail}',
+logPhaseLineFmt: '단계:{phase} 하위:{count}',
+userRejectConnect: '연결 거부',
+walletDenied: '지갑 미승인',
+invalidAddress: '유효한 주소를 입력하세요',
+userPhaseFmt: '단계 {phase}',
+burnProgressThisPhase: '현재 단계 소각 진행',
+burnProgressTotal: '전체 주기 소각 진행',
+burnProgressFmt: '{cur} / {target} · {pct}%',
+err24hHold: '24시간 보유 조건 미충족',
+errTierTimer: '티어 보유 타이머 미시작',
+errTierClaimed: '해당 티어 이미 청구됨',
+errDownHold: '하위 보유량 부족',
+errUpHold: '상위 보유량 부족',
+errHoldQualified: '보유 자격 미달',
+errAlreadyBound: '이미 추천인 연결됨',
+errInvalidReferrer: '유효하지 않은 추천인',
+errSelfRef: '본인을 추천인으로 지정할 수 없음',
+errNoBuy: '하위에 조건 충족 DEX 매수 없음',
+errTooSoon: '너무 빠른 재시도',
+errInvalidTier: '유효하지 않은 티어',
+errNotReferrer: '해당 하위의 추천인이 아님',
+errOldUserClear: '기존 사용자는 먼저 정리 필요',
+errAlreadyClaimed: '이미 청구함',
+errNotQualified: '조건 미충족',
+errInsufficientBalance: '잔액 부족',
+errTransferFailed: '전송 실패',
+errUnauthorized: '미승인',
+errAlreadySigned: '이미 서명',
+errNotEnoughSigs: '서명 수 부족',
+errInvalidAddress: '유효하지 않은 주소',
+errUserRejected: '사용자가 서명 거부',
+errRevertFmt: '되돌림: {reason}',
+errUnknownFmt: '{detail}',
+logErrorFmt: '오류: {msg}',
+wrongNetworkStrict: '네트워크가 올바르지 않습니다. 지갑에서 BSC로 전환한 뒤 다시 연결하세요.',
+contractNotConfigured: '메인 컨트랙트 주소가 설정되지 않아 온체인 데이터를 불러올 수 없습니다(배포 후 CONFIG.MAIN_CONTRACT 설정).',
+zeroAddressNotAllowed: '영(0) 주소는 사용할 수 없습니다.',
+cannotBindSelf: '자기 자신을 추천인으로 설정할 수 없습니다.',
+txPending: '트랜잭션이 전송되었습니다. 확인을 기다리는 중…',
+duplicateActionWait: '이전 트랜잭션이 완료될 때까지 기다려 주세요.'
 },
 vi: {
 pageTitle: 'XYL Token',
@@ -1622,7 +1896,62 @@ downline: 'cấp dưới',
 tierClaim: 'cấp',
 claimSuccess: 'Nhận thành công',
 claimFailed: 'Thất bại',
-operationError: 'Lỗi thao tác'
+operationError: 'Lỗi thao tác',
+chainOnPhase: 'Giai đoạn on-chain',
+phaseEndedBadge: '(đạt mục tiêu đốt, chờ giai đoạn sau)',
+referrerStatusLabel: 'Người giới thiệu',
+holdQualifiedLabel: 'Đủ điều kiện nắm giữ',
+referrerBound: 'Đã liên kết',
+referrerNotBound: 'Chưa liên kết',
+holdYes: '✅ Đạt',
+holdNo: '❌ Chưa đạt',
+userPhaseNewLabel: 'Người mới',
+claimLogTitle: 'Nhật ký',
+refreshModalTitle: 'Làm mới',
+logTryClaimFmt: 'Nhận {addr} tầng {tier}',
+logTierOkFmt: '✓ Tầng {tier} thành công',
+logTierFailFmt: '✗ Tầng {tier} lỗi: {msg}',
+logDoneFmt: 'Xong OK:{ok} lỗi:{fail}',
+logPhaseLineFmt: 'Giai đoạn:{phase} cấp dưới:{count}',
+userRejectConnect: 'Đã hủy kết nối',
+walletDenied: 'Chưa ủy quyền ví',
+invalidAddress: 'Nhập địa chỉ ví hợp lệ',
+userPhaseFmt: 'Giai đoạn {phase}',
+burnProgressThisPhase: 'Tiến độ đốt (giai đoạn này)',
+burnProgressTotal: 'Tiến độ đốt (cả chu kỳ)',
+burnProgressFmt: '{cur} / {target} · {pct}%',
+err24hHold: 'Chưa đủ điều kiện giữ 24h',
+errTierTimer: 'Bộ đếm giữ tầng chưa bắt đầu',
+errTierClaimed: 'Đã nhận thưởng tầng này',
+errDownHold: 'Cấp dưới giữ không đủ',
+errUpHold: 'Cấp trên giữ không đủ',
+errHoldQualified: 'Giữ không đạt',
+errAlreadyBound: 'Đã liên kết người giới thiệu',
+errInvalidReferrer: 'Người giới thiệu không hợp lệ',
+errSelfRef: 'Không thể tự giới thiệu chính mình',
+errNoBuy: 'Cấp dưới chưa mua DEX đủ điều kiện',
+errTooSoon: 'Thao tác quá sớm',
+errInvalidTier: 'Tầng không hợp lệ',
+errNotReferrer: 'Không phải người giới thiệu của cấp dưới',
+errOldUserClear: 'Người cũ cần xả vị thế trước',
+errAlreadyClaimed: 'Đã nhận',
+errNotQualified: 'Không đủ điều kiện',
+errInsufficientBalance: 'Số dư không đủ',
+errTransferFailed: 'Chuyển thất bại',
+errUnauthorized: 'Chưa được phép',
+errAlreadySigned: 'Đã ký',
+errNotEnoughSigs: 'Chưa đủ chữ ký',
+errInvalidAddress: 'Địa chỉ không hợp lệ',
+errUserRejected: 'Người dùng từ chối ký',
+errRevertFmt: 'Hoàn tác: {reason}',
+errUnknownFmt: '{detail}',
+logErrorFmt: 'Lỗi: {msg}',
+wrongNetworkStrict: 'Sai mạng: hãy chuyển sang BSC trong ví rồi kết nối lại.',
+contractNotConfigured: 'Chưa cấu hình địa chỉ hợp đồng chính; không thể đọc dữ liệu on-chain (đặt CONFIG.MAIN_CONTRACT sau khi triển khai).',
+zeroAddressNotAllowed: 'Không được dùng địa chỉ zero.',
+cannotBindSelf: 'Bạn không thể tự gán mình làm người giới thiệu.',
+txPending: 'Giao dịch đã gửi, đang chờ xác nhận…',
+duplicateActionWait: 'Vui lòng chờ giao dịch trước hoàn tất.'
 },
 th: {
 pageTitle: 'XYL Token',
@@ -1701,7 +2030,62 @@ downline: 'ระดับล่าง',
 tierClaim: 'ระดับ',
 claimSuccess: 'รับสำเร็จ',
 claimFailed: 'ล้มเหลว',
-operationError: 'ข้อผิดพลาดการทำงาน'
+operationError: 'ข้อผิดพลาดการทำงาน',
+chainOnPhase: 'เฟสบน-chain',
+phaseEndedBadge: '(ถึงเป้าเผา รอเฟสถัดไป)',
+referrerStatusLabel: 'ผู้แนะนำ',
+holdQualifiedLabel: 'ถือครบเงื่อนไข',
+referrerBound: 'ผูกแล้ว',
+referrerNotBound: 'ยังไม่ผูก',
+holdYes: '✅ ผ่าน',
+holdNo: '❌ ไม่ผ่าน',
+userPhaseNewLabel: 'ผู้ใช้ใหม่',
+claimLogTitle: 'บันทึก',
+refreshModalTitle: 'รีเฟรช',
+logTryClaimFmt: 'รับ {addr} ชั้น {tier}',
+logTierOkFmt: '✓ ชั้น {tier} สำเร็จ',
+logTierFailFmt: '✗ ชั้น {tier} ล้มเหลว: {msg}',
+logDoneFmt: 'เสร็จ สำเร็จ:{ok} ล้มเหลว:{fail}',
+logPhaseLineFmt: 'เฟส:{phase} ดาวน์ไลน์:{count}',
+userRejectConnect: 'ยกเลิกการเชื่อมต่อ',
+walletDenied: 'ยังไม่อนุญาตกระเป๋า',
+invalidAddress: 'ใส่ที่อยู่กระเป๋าที่ถูกต้อง',
+userPhaseFmt: 'เฟส {phase}',
+burnProgressThisPhase: 'ความคืบหน้าเผา (เฟสนี้)',
+burnProgressTotal: 'ความคืบหน้าเผา (ทั้งรอบ)',
+burnProgressFmt: '{cur} / {target} · {pct}%',
+err24hHold: 'ยังไม่ครบเงื่อนไขถือ 24 ชม.',
+errTierTimer: 'ตัวจับเวลาถือระดับยังไม่เริ่ม',
+errTierClaimed: 'รับรางวัลระดับนี้แล้ว',
+errDownHold: 'ดาวน์ไลน์ถือไม่พอ',
+errUpHold: 'อัปไลน์ถือไม่พอ',
+errHoldQualified: 'การถือไม่ผ่านเกณฑ์',
+errAlreadyBound: 'ผูกผู้แนะนำแล้ว',
+errInvalidReferrer: 'ผู้แนะนำไม่ถูกต้อง',
+errSelfRef: 'ไม่สามารถผูกตัวเองเป็นผู้แนะนำ',
+errNoBuy: 'ดาวน์ไลน์ยังไม่ซื้อ DEX ตามเงื่อนไข',
+errTooSoon: 'ทำรีบเกินไป',
+errInvalidTier: 'ระดับไม่ถูกต้อง',
+errNotReferrer: 'ไม่ใช่ผู้แนะนำของดาวน์ไลน์',
+errOldUserClear: 'ผู้ใช้เก่าต้องเคลียร์ก่อน',
+errAlreadyClaimed: 'รับแล้ว',
+errNotQualified: 'ไม่ผ่านเงื่อนไข',
+errInsufficientBalance: 'ยอดไม่พอ',
+errTransferFailed: 'โอนล้มเหลว',
+errUnauthorized: 'ไม่ได้รับอนุญาต',
+errAlreadySigned: 'ลงนามแล้ว',
+errNotEnoughSigs: 'ลายเซ็นไม่พอ',
+errInvalidAddress: 'ที่อยู่ไม่ถูกต้อง',
+errUserRejected: 'ผู้ใช้ปฏิเสธลงนาม',
+errRevertFmt: 'ย้อนกลับ: {reason}',
+errUnknownFmt: '{detail}',
+logErrorFmt: 'ข้อผิดพลาด: {msg}',
+wrongNetworkStrict: 'เครือข่ายไม่ถูกต้อง: สลับเป็น BSC ในกระเป๋าแล้วเชื่อมต่อใหม่',
+contractNotConfigured: 'ยังไม่ได้ตั้งที่อยู่สัญญาหลัก จึงอ่านข้อมูลบนเชนไม่ได้ (ตั้ง CONFIG.MAIN_CONTRACT หลัง deploy)',
+zeroAddressNotAllowed: 'ไม่อนุญาตให้ใช้ที่อยู่ศูนย์',
+cannotBindSelf: 'ไม่สามารถผูกตัวเองเป็นผู้แนะนำได้',
+txPending: 'ส่งธุรกรรมแล้ว กำลังรอการยืนยัน…',
+duplicateActionWait: 'โปรดรอให้ธุรกรรมก่อนหน้าเสร็จสิ้น'
 }
 };
 
@@ -1721,6 +2105,99 @@ let currentLang = safeStorageGet(LANG_STORAGE_KEY) || 'zh-TW';
 function t(key) {
 const langData = I18N[currentLang] || I18N['zh-TW'];
 return langData[key] || key;
+}
+
+/** @param {Record<string, string|number>} [vars] */
+function tf(key, vars) {
+let s = t(key);
+if (vars && typeof vars === 'object') {
+for (const k of Object.keys(vars)) {
+s = s.split('{' + k + '}').join(String(vars[k]));
+}
+}
+return s;
+}
+
+function setElText(id, text) {
+const el = document.getElementById(id);
+if (el) el.textContent = text;
+}
+
+let burnProgressSnapshot = null;
+
+function renderBurnProgressFromSnapshot() {
+if (!burnProgressSnapshot) {
+setElText('burnProgressPhaseText', '--');
+setElText('burnProgressTotalText', '--');
+const f1 = document.getElementById('burnProgressPhaseFill');
+const f2 = document.getElementById('burnProgressTotalFill');
+const t1 = document.getElementById('burnProgressPhaseTrack');
+const t2 = document.getElementById('burnProgressTotalTrack');
+if (f1) f1.style.width = '0%';
+if (f2) f2.style.width = '0%';
+if (t1) t1.setAttribute('aria-valuenow', '0');
+if (t2) t2.setAttribute('aria-valuenow', '0');
+return;
+}
+const s = burnProgressSnapshot;
+setElText('burnProgressPhaseText', tf('burnProgressFmt', {
+cur: formatToken(s.burnedStr),
+target: formatToken(s.targetPhaseStr),
+pct: s.pctPhase
+}));
+setElText('burnProgressTotalText', tf('burnProgressFmt', {
+cur: formatToken(s.burnedStr),
+target: formatToken(s.targetTotalStr),
+pct: s.pctTotal
+}));
+const f1 = document.getElementById('burnProgressPhaseFill');
+const f2 = document.getElementById('burnProgressTotalFill');
+const t1 = document.getElementById('burnProgressPhaseTrack');
+const t2 = document.getElementById('burnProgressTotalTrack');
+if (f1) f1.style.width = s.pctPhase + '%';
+if (f2) f2.style.width = s.pctTotal + '%';
+if (t1) t1.setAttribute('aria-valuenow', String(s.pctPhase));
+if (t2) t2.setAttribute('aria-valuenow', String(s.pctTotal));
+}
+
+async function refreshBurnProgressDisplay(burnedStr, phaseNum) {
+if (!mainContract) {
+burnProgressSnapshot = null;
+renderBurnProgressFromSnapshot();
+return;
+}
+try {
+const cfg0 = await mainContract.methods.phaseConfigs(0).call();
+const cfg1 = await mainContract.methods.phaseConfigs(1).call();
+const cfg2 = await mainContract.methods.phaseConfigs(2).call();
+const e0 = BigInt(cfg0.endBurnThreshold != null ? cfg0.endBurnThreshold : cfg0[1]);
+const e1 = BigInt(cfg1.endBurnThreshold != null ? cfg1.endBurnThreshold : cfg1[1]);
+const e2 = BigInt(cfg2.endBurnThreshold != null ? cfg2.endBurnThreshold : cfg2[1]);
+const b = BigInt(burnedStr);
+let prev = 0n;
+let end = e0;
+if (phaseNum === 2) { prev = e0; end = e1; }
+else if (phaseNum === 3) { prev = e1; end = e2; }
+const span = end > prev ? end - prev : 1n;
+const above = b > prev ? b - prev : 0n;
+let pctPhase = Number(above * 100n / span);
+if (b >= end) pctPhase = 100;
+pctPhase = Math.max(0, Math.min(100, pctPhase));
+let pctTotal = e2 > 0n ? Number(b * 100n / e2) : 0;
+pctTotal = Math.max(0, Math.min(100, pctTotal));
+burnProgressSnapshot = {
+burnedStr: String(burnedStr),
+targetPhaseStr: end.toString(),
+targetTotalStr: e2.toString(),
+pctPhase: Math.round(pctPhase * 10) / 10,
+pctTotal: Math.round(pctTotal * 10) / 10
+};
+renderBurnProgressFromSnapshot();
+} catch (e) {
+console.warn('burn progress', e);
+burnProgressSnapshot = null;
+renderBurnProgressFromSnapshot();
+}
 }
 
 var LANG_UI = {
@@ -1783,6 +2260,7 @@ currentLang = lang;
 safeStorageSet(LANG_STORAGE_KEY, lang);
 applyTranslations();
 updateLangMenuUI();
+renderBurnProgressFromSnapshot();
 collapseLangPanel();
 toggleAppMenu(false);
 }
@@ -1805,38 +2283,77 @@ let mainContract;
 let lockContract;
 let isLoading = false;
 
+const ZERO_ADDRESS_HEX = '0x0000000000000000000000000000000000000000';
+
+function isZeroContractAddress(addr) {
+if (!addr || typeof addr !== 'string') return true;
+return addr.toLowerCase() === ZERO_ADDRESS_HEX.toLowerCase();
+}
+
+async function ensureWalletOnConfiguredChain(ethereum) {
+const tmp = new Web3(ethereum);
+let chainId = Number(await tmp.eth.getChainId());
+if (chainId === CONFIG.CHAIN_ID) return true;
+try {
+await ethereum.request({
+method: 'wallet_switchEthereumChain',
+params: [{ chainId: '0x' + CONFIG.CHAIN_ID.toString(16) }]
+});
+} catch (e) {
+const code = e && e.code;
+if (code === 4902) showToast(t('switchToBSC'), 'error');
+else showToast(t('wrongNetworkStrict'), 'error');
+return false;
+}
+chainId = Number(await tmp.eth.getChainId());
+if (chainId !== CONFIG.CHAIN_ID) {
+showToast(t('wrongNetworkStrict'), 'error');
+return false;
+}
+return true;
+}
+
+function sanitizeUserFacingText(text) {
+if (text == null) return '';
+const s0 = String(text);
+let s = s0.replace(/0x[a-fA-F0-9]{64,}/gi, '0x***');
+s = s.replace(/0x[a-fA-F0-9]{40}/gi, '0x***');
+if (s.length > 220) s = s.slice(0, 220) + '…';
+return s;
+}
+
+let txPipelineBusy = false;
+
+async function sendTxAndWait(sendPromise, options) {
+options = options || {};
+if (!options.skipPendingToast) showToast(t('txPending'), 'info');
+return await sendPromise;
+}
+
 const MAIN_ABI = [
 {"inputs":[],"name":"name","outputs":[{"type":"string"}],"stateMutability":"view","type":"function"},
 {"inputs":[],"name":"symbol","outputs":[{"type":"string"}],"stateMutability":"view","type":"function"},
 {"inputs":[],"name":"totalSupply","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
-{"inputs":[],"name":"getCirculatingSupply","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
 {"inputs":[],"name":"getBurnedAmount","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
-{"inputs":[],"name":"tradingEnabled","outputs":[{"type":"bool"}],"stateMutability":"view","type":"function"},
-{"inputs":[],"name":"currentActivePhase","outputs":[{"type":"uint8"}],"stateMutability":"view","type":"function"},
-{"inputs":[],"name":"getActivePhase","outputs":[{"type":"uint8"}],"stateMutability":"view","type":"function"},
-{"inputs":[],"name":"PHASE1_BURN_TARGET","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
-{"inputs":[],"name":"PHASE2_BURN_TARGET","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
-{"inputs":[],"name":"PHASE3_BURN_TARGET","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
-{"inputs":[],"name":"getPriceInfo","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
 {"inputs":[{"name":"user","type":"address"}],"name":"balanceOf","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
 {"inputs":[{"name":"user","type":"address"}],"name":"referrer","outputs":[{"type":"address"}],"stateMutability":"view","type":"function"},
 {"inputs":[{"name":"user","type":"address"}],"name":"getUserPhase","outputs":[{"type":"uint8"}],"stateMutability":"view","type":"function"},
-{"inputs":[{"name":"user","type":"address"}],"name":"getUserHoldInfo","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"bool"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
-{"inputs":[{"name":"user","type":"address"}],"name":"getUserDEXBuyInfo","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"bool"}],"stateMutability":"view","type":"function"},
-{"inputs":[{"name":"user","type":"address"}],"name":"checkHoldQualified","outputs":[{"type":"bool"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
+{"inputs":[{"name":"user","type":"address"}],"name":"getUserHoldInfo","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"bool"}],"stateMutability":"view","type":"function"},
+{"inputs":[{"name":"user","type":"address"}],"name":"dexBuyAmount","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
 {"inputs":[{"name":"refAddr","type":"address"}],"name":"bindReferrer","outputs":[],"stateMutability":"nonpayable","type":"function"},
 {"inputs":[],"name":"lockContract","outputs":[{"type":"address"}],"stateMutability":"view","type":"function"},
 {"inputs":[{"name":"user","type":"address"}],"name":"downlines","outputs":[{"type":"address[]"}],"stateMutability":"view","type":"function"},
 {"inputs":[{"name":"downline","type":"address"},{"name":"tierId","type":"uint8"}],"name":"claimReward","outputs":[],"stateMutability":"nonpayable","type":"function"},
 {"inputs":[],"name":"currentPhase","outputs":[{"type":"uint8"}],"stateMutability":"view","type":"function"},
+{"inputs":[],"name":"currentPhaseEnded","outputs":[{"type":"bool"}],"stateMutability":"view","type":"function"},
+{"inputs":[{"name":"","type":"uint256"}],"name":"phaseConfigs","outputs":[{"name":"rewardPercent","type":"uint256"},{"name":"endBurnThreshold","type":"uint256"},{"name":"maxBurnForReward","type":"uint256"},{"name":"requireOldUserClear","type":"bool"},{"name":"oldPhaseCount","type":"uint8"}],"stateMutability":"view","type":"function"},
 {"inputs":[{"name":"user","type":"address"}],"name":"getCurrentPhaseNetHold","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
 {"inputs":[{"name":"phase","type":"uint8"},{"name":"tier","type":"uint8"}],"name":"phaseTiers","outputs":[{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
-{"inputs":[{"name":"up","type":"address"},{"name":"down","type":"address"},{"name":"phase","type":"uint8"}],"name":"tierClaimed","outputs":[{"type":"uint8"}],"stateMutability":"view","type":"function"},
-{"inputs":[{"name":"user","type":"address"}],"name":"holdTimerStart","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"}
+{"inputs":[{"name":"up","type":"address"},{"name":"down","type":"address"},{"name":"phase","type":"uint8"}],"name":"tierClaimed","outputs":[{"type":"uint8"}],"stateMutability":"view","type":"function"}
 ];
 
 const LOCK_ABI = [
-{"inputs":[],"name":"getAllLockInfo","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
+{"inputs":[],"name":"getDashboardStats","outputs":[{"name":"privateLockTotal","type":"uint256"},{"name":"privateReleased","type":"uint256"},{"name":"projectLockTotal","type":"uint256"},{"name":"projectReleased","type":"uint256"}],"stateMutability":"view","type":"function"},
 {"inputs":[],"name":"privateLock30","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
 {"inputs":[],"name":"privateLock40","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
 {"inputs":[],"name":"projectLock30","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
@@ -1862,14 +2379,15 @@ return date.toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-dig
 
 function showToast(message, type = 'info') {
 const toast = document.getElementById('toast');
-toast.textContent = message;
+const raw = String(message);
+toast.textContent = type === 'error' ? sanitizeUserFacingText(raw) : raw;
 toast.className = `toast ${type} show`;
 setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
 function showError(msg, elementId = 'referralError') {
 const box = document.getElementById(elementId);
-box.textContent = msg;
+box.textContent = sanitizeUserFacingText(String(msg));
 box.classList.add('show');
 setTimeout(() => box.classList.remove('show'), 5000);
 }
@@ -1896,7 +2414,7 @@ return null;
 async function connectWallet() {
 const ethereum = getEthereumProvider();
 if (!ethereum) {
-showToast('请安装 MetaMask、TokenPocket 或其他 Web3 钱包', 'error');
+showToast(t('installWallet'), 'error');
 return;
 }
 
@@ -1909,28 +2427,13 @@ if (ethereum.enable) accounts = await ethereum.enable();
 else throw e;
 }
 
-if (!accounts || accounts.length === 0) throw new Error('未授权钱包');
+if (!accounts || accounts.length === 0) throw new Error(t('walletDenied'));
+
+if (!(await ensureWalletOnConfiguredChain(ethereum))) return;
 
 account = accounts[0];
 web3 = new Web3(ethereum);
 mainContract = new web3.eth.Contract(MAIN_ABI, CONFIG.MAIN_CONTRACT);
-
-try {
-const chainId = await web3.eth.getChainId();
-if (Number(chainId) !== CONFIG.CHAIN_ID) {
-try {
-await ethereum.request({
-method: 'wallet_switchEthereumChain',
-params: [{ chainId: `0x${CONFIG.CHAIN_ID.toString(16)}` }]
-});
-} catch (switchError) {
-if (switchError.code !== 4902) throw switchError;
-showToast('请手动切换到 BSC 主网', 'error');
-}
-}
-} catch (e) {
-console.warn('检查网络失败:', e);
-}
 
 document.getElementById('beforeConnect').classList.add('hidden');
 document.getElementById('mainContent').classList.remove('hidden');
@@ -1949,19 +2452,30 @@ if (savedRefreshTime) {
 lastRefreshTime = parseInt(savedRefreshTime);
 }
 
+const mainConfigured = !isZeroContractAddress(CONFIG.MAIN_CONTRACT);
+if (mainConfigured) {
 await refreshData();
+} else {
+showToast(t('contractNotConfigured'), 'error');
+}
 
 const pendingRef = getReferrerFromURL();
-if (pendingRef && web3.utils.isAddress(pendingRef)) {
+if (mainConfigured && pendingRef && web3.utils.isAddress(pendingRef)) {
 try {
 const myReferrer = await mainContract.methods.referrer(account).call();
 if (!myReferrer || myReferrer === '0x0000000000000000000000000000000000000000') {
 if (pendingRef.toLowerCase() !== account.toLowerCase()) {
-showToast('正在自动绑定推荐人...', 'success');
+showToast(t('autoBindReferrer'), 'success');
 setTimeout(async () => {
 try {
-await mainContract.methods.bindReferrer(pendingRef).send({ from: account });
-showToast('推荐人绑定成功！', 'success');
+if (txPipelineBusy) return;
+txPipelineBusy = true;
+try {
+await sendTxAndWait(mainContract.methods.bindReferrer(web3.utils.toChecksumAddress(pendingRef)).send({ from: account }));
+showToast(t('bindSuccess'), 'success');
+} finally {
+txPipelineBusy = false;
+}
 } catch (e) {
 console.log('自动绑定失败:', e);
 }
@@ -1975,15 +2489,15 @@ console.log('检查推荐人状态失败:', e);
 
 ethereum.on('accountsChanged', (accounts) => {
 if (!accounts || accounts.length === 0) disconnectWallet();
-else { account = accounts[0]; refreshData(); }
+else { account = accounts[0]; refreshData({ silentOnNoContract: true }); }
 });
 
 ethereum.on('chainChanged', () => window.location.reload());
 
 } catch (error) {
 console.error('连接失败:', error);
-let msg = error.message || '连接失败';
-if (msg.includes('User rejected') || msg.includes('用户取消')) msg = '用户取消连接';
+let msg = error.message || t('operationError');
+if (msg.includes('User rejected') || msg.includes('用户取消')) msg = t('userRejectConnect');
 showToast(msg, 'error');
 }
 }
@@ -1993,7 +2507,7 @@ account = null;
 mainContract = null;
 document.getElementById('beforeConnect').classList.remove('hidden');
 document.getElementById('mainContent').classList.add('hidden');
-updateStatus('', '未连接');
+updateStatus('', t('notConnected'));
 }
 
 function updateStatus(state, text) {
@@ -2004,13 +2518,13 @@ document.getElementById('statusText').textContent = text;
 async function copyReferralLink() {
 const link = document.getElementById('referralLink').value;
 if (!link) {
-showToast('请先连接钱包', 'error');
+showToast(t('connectFirst'), 'error');
 return;
 }
 
 try {
 await navigator.clipboard.writeText(link);
-showToast('复制成功！', 'success');
+showToast(t('copySuccess'), 'success');
 } catch (e) {
 const textarea = document.createElement('textarea');
 textarea.value = link;
@@ -2018,94 +2532,139 @@ document.body.appendChild(textarea);
 textarea.select();
 document.execCommand('copy');
 document.body.removeChild(textarea);
-showToast('复制成功！', 'success');
+showToast(t('copySuccess'), 'success');
 }
 }
 
 async function bindReferrer() {
-const refAddr = document.getElementById('referrerInput').value.trim();
+if (!mainContract || !account) {
+showToast(t('connectFirst'), 'error');
+return;
+}
+if (isZeroContractAddress(CONFIG.MAIN_CONTRACT)) {
+showError(t('contractNotConfigured'));
+return;
+}
+if (txPipelineBusy) {
+showToast(t('duplicateActionWait'), 'error');
+return;
+}
+const raw = document.getElementById('referrerInput').value.trim();
+let refAddr;
+try {
+refAddr = web3.utils.toChecksumAddress(raw);
+} catch (e) {
+showError(t('invalidAddress'));
+return;
+}
 if (!web3.utils.isAddress(refAddr)) {
-showError('请输入有效的钱包地址');
+showError(t('invalidAddress'));
+return;
+}
+if (isZeroContractAddress(refAddr)) {
+showError(t('zeroAddressNotAllowed'));
+return;
+}
+if (refAddr.toLowerCase() === account.toLowerCase()) {
+showError(t('cannotBindSelf'));
 return;
 }
 
+txPipelineBusy = true;
 try {
-await mainContract.methods.bindReferrer(refAddr).send({ from: account });
-showToast('绑定成功！', 'success');
+await sendTxAndWait(mainContract.methods.bindReferrer(refAddr).send({ from: account }));
+showToast(t('bindSuccessToast'), 'success');
 refreshData();
 } catch (error) {
 console.error('绑定失败:', error);
 let msg = translateError(error);
-if (msg.includes('user rejected') || msg === '用户取消签名') {
-showError('用户取消签名');
+if (isUserCancellation(error)) {
+showError(t('errUserRejected'));
 } else {
 showError(msg);
 }
+} finally {
+txPipelineBusy = false;
 }
 }
 
-async function refreshData() {
+async function refreshData(opts) {
+opts = opts || {};
 if (!mainContract || isLoading) return;
+if (isZeroContractAddress(CONFIG.MAIN_CONTRACT)) {
+if (!opts.silentOnNoContract) showToast(t('contractNotConfigured'), 'error');
+return;
+}
 
 const btn = document.getElementById('refreshBtn');
 btn.classList.add('spinning');
 isLoading = true;
 
+const ZERO_ADDR = '0x0000000000000000000000000000000000000000';
+
 try {
 await mainContract.methods.name().call();
 
-const activePhase = await mainContract.methods.getActivePhase().call();
-const phaseNum = Number(activePhase);
-                document.getElementById('currentPhase').textContent = phaseNum === 0 ? '已结束' : `阶段${phaseNum}`;
+const cpRaw = await mainContract.methods.currentPhase().call();
+const phaseNum = Number(cpRaw);
+const phaseEnded = await mainContract.methods.currentPhaseEnded().call();
+
+let homePhaseText = tf('userPhaseFmt', { phase: phaseNum });
+if (phaseEnded) {
+homePhaseText += ' ' + t('phaseEndedBadge');
+}
+setElText('homeChainPhase', homePhaseText);
 
 ['phase1', 'phase2', 'phase3'].forEach((id, i) => {
-document.getElementById(id).classList.toggle('active', i + 1 === phaseNum);
+const el = document.getElementById(id);
+if (el) el.classList.toggle('active', i + 1 === phaseNum);
 });
 
-const rewardRates = ['--', '1%', '3%', '5%'];
-const phaseTargets = [0, 400000000, 650000000, 800000000];
+for (let tierId = 0; tierId < 3; tierId++) {
+const tier = await mainContract.methods.phaseTiers(cpRaw, tierId).call();
+const upMin = tier.upMin != null ? tier.upMin : tier[0];
+const downMin = tier.downMin != null ? tier.downMin : tier[1];
+setElText('tierUp' + tierId, formatToken(String(upMin)));
+setElText('tierDown' + tierId, formatToken(String(downMin)));
+}
 
 const burned = await mainContract.methods.getBurnedAmount().call();
-const burnedNum = Number(burned);
+const supply = await mainContract.methods.totalSupply().call();
+let circBn = BigInt(supply) - BigInt(burned);
+if (circBn < 0n) circBn = 0n;
 
-const circulating = await mainContract.methods.getCirculatingSupply().call();
-document.getElementById('burnedAmount').textContent = formatToken(burned);
-document.getElementById('circulating').textContent = formatToken(circulating);
+setElText('burnedAmount', formatToken(String(burned)));
+setElText('circulating', formatToken(circBn.toString()));
 
-                try {
-                    const priceInfo = await mainContract.methods.getPriceInfo().call();
-                    if (priceInfo[2] > 0) {
-                        const priceBNB = Number(priceInfo[2]) / 1e18;
-                        document.getElementById('tokenPrice').textContent = priceBNB.toFixed(8) + ' BNB';
-                    }
-                } catch (e) {}
-                
+await refreshBurnProgressDisplay(String(burned), phaseNum);
+
 const balance = await mainContract.methods.balanceOf(account).call();
-document.getElementById('userBalance').textContent = formatToken(balance);
+setElText('userBalance', formatToken(balance));
 
-                const userReferrer = await mainContract.methods.referrer(account).call();
-                document.getElementById('referrerStatus').textContent = 
-                    userReferrer !== '0x0000000000000000000000000000000000000000' ? '已绑定' : '未绑定';
-                
-                const userPhase = await mainContract.methods.getUserPhase(account).call();
-                document.getElementById('userPhase').textContent = 
-                    Number(userPhase) === 0 ? '新用户' : `阶段${userPhase}`;
-                
-                const holdInfo = await mainContract.methods.getUserHoldInfo(account).call();
-                document.getElementById('userThreshold').textContent = formatToken(holdInfo[0]);
-                document.getElementById('holdThreshold').textContent = formatToken(holdInfo[0]);
-                document.getElementById('holdStartTime').textContent = formatDate(holdInfo[1]);
-                document.getElementById('holdEndTime').textContent = formatDate(holdInfo[2]);
-                document.getElementById('holdQualified').textContent = holdInfo[3] ? '✅ 满足' : '❌ 不满足';
-                document.getElementById('qualified').textContent = holdInfo[3] ? '✅' : '❌';
-                
-const dexInfo = await mainContract.methods.getUserDEXBuyInfo(account).call();
-document.getElementById('dexBuy').textContent = formatToken(dexInfo[0]);
+const userReferrer = await mainContract.methods.referrer(account).call();
+const refOk = userReferrer && String(userReferrer).toLowerCase() !== ZERO_ADDR.toLowerCase();
+setElText('referrerStatus', refOk ? t('referrerBound') : t('referrerNotBound'));
+
+const userPhase = await mainContract.methods.getUserPhase(account).call();
+const uph = Number(userPhase);
+setElText('userPhase', uph === 0 ? t('userPhaseNewLabel') : tf('userPhaseFmt', { phase: uph }));
+
+const holdInfo = await mainContract.methods.getUserHoldInfo(account).call();
+setElText('holdThreshold', formatToken(String(holdInfo[0])));
+setElText('holdStartTime', formatDate(holdInfo[1]));
+setElText('holdEndTime', formatDate(holdInfo[2]));
+const hq = holdInfo[3] === true || holdInfo[3] === 'true';
+setElText('holdQualified', hq ? t('holdYes') : t('holdNo'));
+
+const dexBuy = await mainContract.methods.dexBuyAmount(account).call();
+setElText('dexBuy', formatToken(String(dexBuy)));
 
 await loadLockData();
 
 } catch (error) {
 console.error('获取数据失败:', error);
+burnProgressSnapshot = null;
+renderBurnProgressFromSnapshot();
 } finally {
 btn.classList.remove('spinning');
 isLoading = false;
@@ -2114,26 +2673,23 @@ isLoading = false;
 
 async function loadLockData() {
 try {
-const lockAddr = await mainContract.methods.lockContract().call();
+const ZERO = '0x0000000000000000000000000000000000000000';
+const onChain = await mainContract.methods.lockContract().call();
+let lockAddr = onChain;
+const fb = CONFIG.LOCK_CONTRACT;
+if ((!lockAddr || String(lockAddr).toLowerCase() === ZERO.toLowerCase()) && fb && String(fb).toLowerCase() !== ZERO.toLowerCase()) {
+lockAddr = fb;
+}
 
-if (lockAddr && lockAddr !== '0x0000000000000000000000000000000000000000') {
+if (lockAddr && String(lockAddr).toLowerCase() !== ZERO.toLowerCase()) {
 lockContract = new web3.eth.Contract(LOCK_ABI, lockAddr);
 
-const lockInfo = await lockContract.methods.getAllLockInfo().call();
+const stats = await lockContract.methods.getDashboardStats().call();
 
-const private30Total = lockInfo[0];
-const private30Released = lockInfo[1];
-const private40Total = lockInfo[2];
-const private40Released = lockInfo[3];
-const project30Total = lockInfo[5];
-const project30Released = lockInfo[6];
-const project40Total = lockInfo[7];
-const project40Released = lockInfo[8];
-
-const privateLockTotal = BigInt(private30Total) + BigInt(private40Total);
-const privateReleased = BigInt(private30Released) + BigInt(private40Released);
-const projectLockTotal = BigInt(project30Total) + BigInt(project40Total);
-const projectReleased = BigInt(project30Released) + BigInt(project40Released);
+const privateLockTotal = BigInt(stats.privateLockTotal ?? stats[0]);
+const privateReleased = BigInt(stats.privateReleased ?? stats[1]);
+const projectLockTotal = BigInt(stats.projectLockTotal ?? stats[2]);
+const projectReleased = BigInt(stats.projectReleased ?? stats[3]);
 
 document.getElementById('privateLockTotal').textContent = formatToken(privateLockTotal.toString());
 document.getElementById('privateReleased').textContent = formatToken(privateReleased.toString());
@@ -2145,21 +2701,66 @@ console.error('获取锁仓数据失败:', error);
 }
 }
 
+function renderDownlineListEmpty() {
+const root = document.getElementById('downlineList');
+if (!root) return;
+root.replaceChildren();
+const div = document.createElement('div');
+div.style.textAlign = 'center';
+div.style.padding = '20px';
+div.style.color = 'rgba(255,255,255,0.5)';
+div.textContent = t('noDownline');
+root.appendChild(div);
+}
+
+function renderDownlineListRows(rows) {
+const root = document.getElementById('downlineList');
+if (!root) return;
+root.replaceChildren();
+for (let i = 0; i < rows.length; i++) {
+const row = rows[i];
+const card = document.createElement('div');
+card.className = 'downline-card';
+const addrSpan = document.createElement('span');
+addrSpan.className = 'downline-address';
+addrSpan.textContent = row.downline.slice(0, 6) + '...' + row.downline.slice(-4);
+const badge = document.createElement('span');
+badge.className = 'downline-badge ' + row.status;
+badge.textContent = row.statusText;
+card.appendChild(addrSpan);
+card.appendChild(badge);
+root.appendChild(card);
+}
+}
+
+function setRefreshInfoLines(line1, line2) {
+const el = document.getElementById('refreshInfo');
+if (!el) return;
+el.replaceChildren();
+const s1 = document.createElement('span');
+s1.textContent = line1;
+el.appendChild(s1);
+el.appendChild(document.createElement('br'));
+const s2 = document.createElement('span');
+s2.textContent = line2;
+el.appendChild(s2);
+}
+
 let lastClaimTime = 0;
 let lastRefreshTime = 0;
 
 async function loadDownlines() {
-if (!mainContract) return;
+if (!mainContract || isZeroContractAddress(CONFIG.MAIN_CONTRACT)) return;
 
 try {
 const downlines = await mainContract.methods.downlines(account).call();
 
 if (downlines.length === 0) {
-document.getElementById('downlineList').innerHTML = '<div style="text-align: center; padding: 20px; color: rgba(255,255,255,0.5);">暂无下级</div>';
+renderDownlineListEmpty();
 return;
 }
 
-let html = '';
+const rows = [];
 const currentPhase = await mainContract.methods.currentPhase().call();
 const myHold = await mainContract.methods.getCurrentPhaseNetHold(account).call();
 
@@ -2168,14 +2769,16 @@ const tierClaimed = await mainContract.methods.tierClaimed(account, downline, cu
 const downHold = await mainContract.methods.getCurrentPhaseNetHold(downline).call();
 
 let status = 'inactive';
-let statusText = '未达标';
+let statusText = t('notQualified');
 
 for (let tierId = 0; tierId < 3; tierId++) {
 const tier = await mainContract.methods.phaseTiers(currentPhase, tierId).call();
+const upMin = tier.upMin != null ? tier.upMin : tier[0];
+const downMin = tier.downMin != null ? tier.downMin : tier[1];
 if ((tierClaimed & (1 << tierId)) === 0) {
-if (Number(downHold) >= Number(tier.downMin) && Number(myHold) >= Number(tier.upMin)) {
+if (Number(downHold) >= Number(downMin) && Number(myHold) >= Number(upMin)) {
 status = 'claimable';
-statusText = '可领取';
+statusText = t('claimable');
 break;
 }
 }
@@ -2184,31 +2787,31 @@ break;
 if (status === 'inactive') {
 if (tierClaimed === 7) {
 status = 'claimed';
-statusText = '已领完';
+statusText = t('claimedAll');
 }
 }
 
-html += `
-                       <div class="downline-card">
-                           <span class="downline-address">${downline.slice(0,6)}...${downline.slice(-4)}</span>
-                           <span class="downline-badge ${status}">${statusText}</span>
-                       </div>
-                   `;
+rows.push({ downline, status, statusText });
 }
 
-document.getElementById('downlineList').innerHTML = html;
+renderDownlineListRows(rows);
 } catch (e) {
 console.error('加载下级列表失败:', e);
 }
 }
 
 async function refreshAllDownlines() {
+if (!mainContract || !account) return;
+if (isZeroContractAddress(CONFIG.MAIN_CONTRACT)) {
+showToast(t('contractNotConfigured'), 'error');
+return;
+}
 const COOLDOWN_HOURS = 24;
 const now = Date.now();
 
 if (lastRefreshTime > 0 && (now - lastRefreshTime) < (COOLDOWN_HOURS * 60 * 60 * 1000)) {
 const remaining = Math.ceil((lastRefreshTime + COOLDOWN_HOURS * 60 * 60 * 1000 - now) / (60 * 1000));
-showToast(`请等待 ${remaining} 分钟后再刷新`, 'error');
+showToast(tf('waitToRefresh', { minutes: remaining }), 'error');
 return;
 }
 
@@ -2219,9 +2822,11 @@ lastRefreshTime = Date.now();
 localStorage.setItem('xyl_last_refresh', lastRefreshTime.toString());
 
 const nextRefreshTime = new Date(lastRefreshTime + COOLDOWN_HOURS * 60 * 60 * 1000);
-document.getElementById('refreshInfo').innerHTML = 
-    `上次刷新: ${new Date(lastRefreshTime).toLocaleString('zh-CN')}<br>` +
-    `下次刷新: ${nextRefreshTime.toLocaleString('zh-CN')}`;
+const loc = (navigator.language || currentLang || 'zh-TW').replace('_', '-');
+setRefreshInfoLines(
+`${t('lastRefresh')}: ${new Date(lastRefreshTime).toLocaleString(loc)}`,
+`${t('nextRefresh')}: ${nextRefreshTime.toLocaleString(loc)}`
+);
 
 const modal = document.getElementById('refreshModal');
 modal.style.display = 'flex';
@@ -2237,31 +2842,41 @@ console.error('刷新失败:', e);
 }
 
 async function autoClaimAll() {
-if (!mainContract) return;
+if (!mainContract || !account) return;
+if (isZeroContractAddress(CONFIG.MAIN_CONTRACT)) {
+showToast(t('contractNotConfigured'), 'error');
+return;
+}
+if (txPipelineBusy) {
+showToast(t('duplicateActionWait'), 'error');
+return;
+}
 
 const COOLDOWN_HOURS = 24;
 const now = Date.now();
 
 if (lastClaimTime > 0 && (now - lastClaimTime) < (COOLDOWN_HOURS * 60 * 60 * 1000)) {
 const remaining = Math.ceil((lastClaimTime + COOLDOWN_HOURS * 60 * 60 * 1000 - now) / (60 * 1000));
-showToast(`请等待 ${remaining} 分钟后再领取`, 'error');
+showToast(tf('waitToClaim', { minutes: remaining }), 'error');
 return;
 }
 
 const claimLog = document.getElementById('claimLog');
 claimLog.style.display = 'block';
-document.getElementById('logContent').innerHTML = '';
+document.getElementById('logContent').replaceChildren();
 
 if (window.logTimeout) clearTimeout(window.logTimeout);
 window.logTimeout = setTimeout(() => {
 claimLog.style.display = 'none';
 }, 5000);
 
+txPipelineBusy = true;
+try {
 try {
 const downlines = await mainContract.methods.downlines(account).call();
 
 if (downlines.length === 0) {
-addLog('没有下级可领取', 'info');
+addLog(t('noDownlineToClaim'), 'info');
 return;
 }
 
@@ -2272,8 +2887,8 @@ let successCount = 0;
 let failCount = 0;
 let claimableCount = 0;
 
-addLog('开始一键领取奖励...', 'info');
-addLog(`当前阶段: ${currentPhase}, 下级数量: ${downlines.length}`, 'info');
+addLog(t('startClaiming'), 'info');
+addLog(tf('logPhaseLineFmt', { phase: currentPhase, count: downlines.length }), 'info');
 
 for (const downline of downlines) {
 const tierClaimed = await mainContract.methods.tierClaimed(account, downline, currentPhase).call();
@@ -2283,22 +2898,25 @@ for (let tierId = 0; tierId < 3; tierId++) {
 if ((tierClaimed & (1 << tierId)) !== 0) continue;
 
 const tier = await mainContract.methods.phaseTiers(currentPhase, tierId).call();
-if (Number(downHold) < Number(tier.downMin) || Number(myHold) < Number(tier.upMin)) continue;
+const upMin = tier.upMin != null ? tier.upMin : tier[0];
+const downMin = tier.downMin != null ? tier.downMin : tier[1];
+if (Number(downHold) < Number(downMin) || Number(myHold) < Number(upMin)) continue;
 
 claimableCount++;
-addLog(`尝试领取 ${downline.slice(0,6)}...${downline.slice(-4)} 档${tierId + 1}`, 'info');
+const addrShort = `${downline.slice(0,6)}...${downline.slice(-4)}`;
+addLog(tf('logTryClaimFmt', { addr: addrShort, tier: tierId + 1 }), 'info');
 
 try {
-await mainContract.methods.claimReward(downline, tierId).send({ from: account });
-addLog(`✓ 档${tierId + 1} 领取成功`, 'success');
+await sendTxAndWait(mainContract.methods.claimReward(downline, tierId).send({ from: account }), { skipPendingToast: true });
+addLog(tf('logTierOkFmt', { tier: tierId + 1 }), 'success');
 successCount++;
 } catch (e) {
-const errMsg = translateError(e);
-if (errMsg === '用户取消签名') {
-addLog('✗ 用户取消签名，领取终止', 'error');
+if (isUserCancellation(e)) {
+addLog(t('userCancelled'), 'error');
 return;
 }
-addLog(`✗ 档${tierId + 1} 失败: ${errMsg}`, 'error');
+const errMsg = translateError(e);
+addLog(tf('logTierFailFmt', { tier: tierId + 1, msg: errMsg }), 'error');
 failCount++;
 }
 
@@ -2307,18 +2925,20 @@ await new Promise(r => setTimeout(r, 500));
 }
 
 if (claimableCount === 0) {
-addLog('当前没有可领取的奖励', 'info');
+addLog(t('noClaimableReward'), 'info');
 } else {
-addLog(`完成！成功: ${successCount}, 失败: ${failCount}`, 'info');
+addLog(tf('logDoneFmt', { ok: successCount, fail: failCount }), 'info');
 lastClaimTime = Date.now();
 localStorage.setItem('xyl_last_claim', lastClaimTime.toString());
-document.getElementById('lastClaimTime').textContent = `上次领取: ${new Date(lastClaimTime).toLocaleString('zh-CN')}`;
 }
 
 loadDownlines();
 
 } catch (e) {
-addLog(`错误: ${translateError(e)}`, 'error');
+addLog(tf('logErrorFmt', { msg: translateError(e) }), 'error');
+}
+} finally {
+txPipelineBusy = false;
 }
 }
 
@@ -2343,68 +2963,69 @@ document.getElementById('errorModal').style.display = 'none';
 document.getElementById('claimLog').style.display = 'none';
 }
 
+function isUserCancellation(err) {
+if (err && (err.code === 4001 || err.code === 'ACTION_REJECTED')) return true;
+let errMsg = '';
+if (typeof err === 'object' && err !== null) {
+errMsg = err.message || err.reason || '';
+} else {
+errMsg = String(err || '');
+}
+const m = errMsg.toLowerCase();
+return m.includes('user rejected') || m.includes('user denied') || m.includes('rejected the request') || m.includes('cancelled') || m.includes('canceled');
+}
+
 function translateError(err) {
-    // Web3 错误可能是对象或字符串
-    let errMsg = '';
-    if (typeof err === 'object') {
-        if (err.message) errMsg = err.message;
-        else if (err.reason) errMsg = err.reason;
-        else if (err.data) errMsg = JSON.stringify(err.data);
-        else errMsg = JSON.stringify(err);
-    } else {
-        errMsg = err;
-    }
-    
-    // 常见错误映射（按优先级排序，最特殊的在前）
-    const errorMap = [
-        ['execution reverted: 24h hold not met', '24小时持仓未满足'],
-        ['execution reverted: Tier hold timer not started', '档位持仓计时未开始'],
-        ['execution reverted: Tier already claimed', '该档位已领取'],
-        ['execution reverted: Down hold not enough', '下级持仓不足'],
-        ['execution reverted: Up hold not enough', '上级持仓不足'],
-        ['execution reverted: Hold not qualified', '持仓不达标'],
-        ['execution reverted: Already bound', '已绑定过推荐人'],
-        ['execution reverted: Invalid referrer', '无效推荐人'],
-        ['execution reverted: Self ref', '不能绑定自己为推荐人'],
-        ['execution reverted: No buy', '下级未购买过'],
-        ['execution reverted: Too soon', '操作太频繁，请稍后'],
-        ['execution reverted: Invalid tier', '无效档位'],
-        ['execution reverted: Not referrer', '不是该下级的推荐人'],
-        ['execution reverted: Old user must clear', '老用户需先清仓'],
-        ['24h hold not met', '24小时持仓未满足'],
-        ['Tier hold timer not started', '档位持仓计时未开始'],
-        ['Tier already claimed', '该档位已领取'],
-        ['Down hold not enough', '下级持仓不足'],
-        ['Up hold not enough', '上级持仓不足'],
-        ['Hold not qualified', '持仓不达标'],
-        ['Already bound', '已绑定过推荐人'],
-        ['Invalid referrer', '无效推荐人'],
-        ['Self ref', '不能绑定自己为推荐人'],
-        ['No buy', '下级未购买过'],
-        ['user rejected', '用户取消签名'],
-        ['Already claimed', '已领取过'],
-        ['Not qualified', '不满足条件'],
-        ['Insufficient balance', '余额不足'],
-        ['Transfer failed', '转账失败'],
-        ['Unauthorized', '未授权'],
-        ['Already signed', '已签名'],
-        ['Not enough signatures', '签名数量不足'],
-        ['Invalid address', '无效地址']
-    ];
-    
-    for (const [en, zh] of errorMap) {
-        if (errMsg.includes(en)) return zh;
-    }
-    
-    // 提取 revert 后面的消息
-    const revertMatch = errMsg.match(/revert\s+(\w+\s*\w*)/i);
-    if (revertMatch) {
-        const reason = revertMatch[1].trim();
-        return `操作失败: ${reason}`;
-    }
-    
-    // 返回简化后的原始消息
-    return errMsg.length > 60 ? errMsg.substring(0, 60) + '...' : errMsg;
+let errMsg = '';
+if (typeof err === 'object' && err !== null) {
+if (err.message) errMsg = err.message;
+else if (err.reason) errMsg = err.reason;
+else if (err.data) errMsg = JSON.stringify(err.data);
+else errMsg = JSON.stringify(err);
+} else {
+errMsg = String(err || '');
+}
+
+const lower = errMsg.toLowerCase();
+const patterns = [
+['24h hold not met', 'err24hHold'],
+['tier hold timer not started', 'errTierTimer'],
+['tier already claimed', 'errTierClaimed'],
+['down hold not enough', 'errDownHold'],
+['up hold not enough', 'errUpHold'],
+['hold not qualified', 'errHoldQualified'],
+['already bound', 'errAlreadyBound'],
+['invalid referrer', 'errInvalidReferrer'],
+['self ref', 'errSelfRef'],
+['no buy', 'errNoBuy'],
+['too soon', 'errTooSoon'],
+['invalid tier', 'errInvalidTier'],
+['not referrer', 'errNotReferrer'],
+['old user must clear', 'errOldUserClear'],
+['already claimed', 'errAlreadyClaimed'],
+['not qualified', 'errNotQualified'],
+['insufficient balance', 'errInsufficientBalance'],
+['transfer failed', 'errTransferFailed'],
+['unauthorized', 'errUnauthorized'],
+['already signed', 'errAlreadySigned'],
+['not enough signatures', 'errNotEnoughSigs'],
+['invalid address', 'errInvalidAddress'],
+['user rejected', 'errUserRejected'],
+['user denied', 'errUserRejected']
+];
+
+for (let i = 0; i < patterns.length; i++) {
+if (lower.includes(patterns[i][0])) return t(patterns[i][1]);
+}
+
+const revertMatch = errMsg.match(/revert(?:ed)?[:\s]+(.+)/i);
+if (revertMatch && revertMatch[1]) {
+const reason = revertMatch[1].trim().slice(0, 120);
+return sanitizeUserFacingText(tf('errRevertFmt', { reason: reason }));
+}
+
+const short = errMsg.length > 120 ? errMsg.substring(0, 120) + '...' : errMsg;
+return sanitizeUserFacingText(tf('errUnknownFmt', { detail: short }));
 }
 
 window.addEventListener('load', async () => {
@@ -2441,13 +3062,13 @@ await connectWallet();
 
 <div id="refreshModal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
-        <div class="modal-title">刷新信息</div>
+        <div class="modal-title" data-i18n="refreshModalTitle">刷新信息</div>
         <div class="modal-text" id="refreshInfo">
             上次刷新: --<br>
             下次刷新: --
         </div>
         <div class="modal-btn-group">
-            <button class="modal-btn confirm" id="refreshModalOk">确定</button>
+            <button class="modal-btn confirm" id="refreshModalOk" data-i18n="confirm">确定</button>
         </div>
     </div>
 </div>
