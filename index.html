@@ -1258,13 +1258,20 @@ flex-wrap: wrap;
  * REFERRAL_BASE：推广落地页所在站点根 URL，须以 / 结尾。不填则自动用「当前 index.html 所在目录」（GitHub Pages 上传后一般为你的仓库主页路径，无需写死旧域名）。
  */
 const CONFIG = {
-BSC_RPC: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+BSC_RPC: "https://bsc-testnet.bnbchain.org",
 CHAIN_ID: 97,
 MAIN_CONTRACT: "0x2B69565BaC23C5608a81595104Cd5F0eBA99f561",
 LOCK_CONTRACT: "0x0000000000000000000000000000000000000000",
 TOKEN_DECIMALS: 18,
 REFERRAL_BASE: ""
 };
+
+/** BSC 测试网读链备用 RPC（HTTP 直连，不依赖 MetaMask 节点；按顺序尝试） */
+const RPC_FALLBACKS = [
+  "https://bsc-testnet.bnbchain.org",
+  "https://data-seed-prebsc-1-s1.binance.org:8545/",
+  "https://bsc-testnet.publicnode.com"
+];
 
 const I18N = {
 'zh-TW': {
@@ -2187,28 +2194,29 @@ renderBurnProgressFromSnapshot();
 return;
 }
 try {
-const cfg0 = await mainContract.methods.phaseConfigs(0).call();
-const cfg1 = await mainContract.methods.phaseConfigs(1).call();
-const cfg2 = await mainContract.methods.phaseConfigs(2).call();
-const e0 = BigInt(cfg0.endBurnThreshold != null ? cfg0.endBurnThreshold : cfg0[1]);
-const e1 = BigInt(cfg1.endBurnThreshold != null ? cfg1.endBurnThreshold : cfg1[1]);
-const e2 = BigInt(cfg2.endBurnThreshold != null ? cfg2.endBurnThreshold : cfg2[1]);
-const b = BigInt(burnedStr);
-let prev = 0n;
+const cfg0 = await vc().methods.phaseConfigs(0).call();
+const cfg1 = await vc().methods.phaseConfigs(1).call();
+const cfg2 = await vc().methods.phaseConfigs(2).call();
+const BN = web3.utils.BN;
+const e0 = BN(cfg0.endBurnThreshold != null ? cfg0.endBurnThreshold : cfg0[1]);
+const e1 = BN(cfg1.endBurnThreshold != null ? cfg1.endBurnThreshold : cfg1[1]);
+const e2 = BN(cfg2.endBurnThreshold != null ? cfg2.endBurnThreshold : cfg2[1]);
+const b = BN(burnedStr);
+let prev = BN(0);
 let end = e0;
 if (phaseNum === 2) { prev = e0; end = e1; }
 else if (phaseNum === 3) { prev = e1; end = e2; }
-const span = end > prev ? end - prev : 1n;
-const above = b > prev ? b - prev : 0n;
-let pctPhase = Number(above * 100n / span);
-if (b >= end) pctPhase = 100;
+const span = end.gt(prev) ? end.sub(prev) : BN(1);
+const above = b.gt(prev) ? b.sub(prev) : BN(0);
+let pctPhase = above.mul(BN(100)).div(span).toNumber();
+if (b.gte(end)) pctPhase = 100;
 pctPhase = Math.max(0, Math.min(100, pctPhase));
-let pctTotal = e2 > 0n ? Number(b * 100n / e2) : 0;
+let pctTotal = e2.gtn(0) ? b.mul(BN(100)).div(e2).toNumber() : 0;
 pctTotal = Math.max(0, Math.min(100, pctTotal));
 burnProgressSnapshot = {
 burnedStr: String(burnedStr),
-targetPhaseStr: end.toString(),
-targetTotalStr: e2.toString(),
+targetPhaseStr: end.toString(10),
+targetTotalStr: e2.toString(10),
 pctPhase: Math.round(pctPhase * 10) / 10,
 pctTotal: Math.round(pctTotal * 10) / 10
 };
@@ -2300,8 +2308,73 @@ el.placeholder = t(key);
 let web3;
 let account;
 let mainContract;
+let readWeb3;
+let readContract;
 let lockContract;
 let isLoading = false;
+
+function vc() {
+return readContract || mainContract;
+}
+
+/** TokenPocket / MetaMask 等 App 内置浏览器：必须用钱包注入节点读链，不能直连 HTTP RPC（易被 CORS/HTTPS 拦截） */
+function isInAppWalletBrowser() {
+if (typeof window === "undefined") return false;
+if (window.ethereum && (window.ethereum.isTokenPocket || window.ethereum.isMetaMask)) return true;
+if (window.tokenpocket || window.tp) return true;
+const ua = navigator.userAgent || "";
+return /TokenPocket|MetaMaskMobile|imToken|TrustWallet|OKApp/i.test(ua);
+}
+
+async function initReadProvider() {
+readWeb3 = null;
+readContract = null;
+if (web3 && mainContract) {
+readWeb3 = web3;
+readContract = mainContract;
+try {
+await mainContract.methods.totalSupply().call();
+console.info("[XYL] read via wallet (in-app or desktop)");
+return true;
+} catch (eWallet) {
+console.warn("[XYL] wallet read probe failed", eWallet);
+readWeb3 = null;
+readContract = null;
+}
+}
+if (isInAppWalletBrowser()) {
+console.warn("[XYL] in-app wallet: skip HTTP RPC, ensure chain 97 and contract address");
+return !!(readContract && readWeb3);
+}
+const primary = (CONFIG.BSC_RPC || "").trim();
+const urls = primary
+  ? [primary].concat(RPC_FALLBACKS.filter(function (u) { return u !== primary; }))
+  : RPC_FALLBACKS.slice();
+for (let i = 0; i < urls.length; i++) {
+const url = urls[i];
+try {
+const provider = new Web3.providers.HttpProvider(url, { keepAlive: false, timeout: 20000 });
+const w = new Web3(provider);
+const block = await Promise.race([
+w.eth.getBlockNumber(),
+new Promise(function (_, rej) { setTimeout(function () { rej(new Error("rpc timeout")); }, 20000); })
+]);
+readWeb3 = w;
+readContract = new w.eth.Contract(MAIN_ABI, CONFIG.MAIN_CONTRACT);
+console.info("[XYL] read RPC ok:", url, "block", block);
+return true;
+} catch (e) {
+console.warn("[XYL] RPC fail:", url, e && (e.message || e));
+}
+}
+if (web3 && mainContract) {
+readWeb3 = web3;
+readContract = mainContract;
+console.warn("[XYL] HTTP RPC failed, fallback wallet");
+return false;
+}
+return false;
+}
 
 const ZERO_ADDRESS_HEX = '0x0000000000000000000000000000000000000000';
 
@@ -2354,7 +2427,7 @@ refEl.removeAttribute('aria-label');
 return;
 }
 try {
-const raw = await mainContract.methods.referrer(account).call();
+const raw = await vc().methods.referrer(account).call();
 const addr = normalizeAddressResult(raw);
 const refOk = addr && isLikelyEthAddress(addr) && !isZeroContractAddress(addr);
 if (refOk) {
@@ -2449,15 +2522,32 @@ const LOCK_ABI = [
 {"inputs":[],"name":"projectLock40","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"}
 ];
 
-function formatToken(amount, decimals = CONFIG.TOKEN_DECIMALS) {
-if (!amount || amount === '0') return '0';
-const num = BigInt(amount);
+function formatToken(amount, decimals) {
+decimals = decimals == null ? CONFIG.TOKEN_DECIMALS : decimals;
+const raw = String(amount == null ? "" : amount).trim();
+if (!raw || raw === "0") return "0";
+if (web3 && web3.utils && decimals === 18) {
+try {
+const ether = web3.utils.fromWei(raw, "ether");
+const parts = ether.split(".");
+const whole = Number(parts[0]).toLocaleString();
+if (!parts[1] || /^0+$/.test(parts[1])) return whole;
+const frac = parts[1].replace(/0+$/, "").slice(0, 4);
+return frac ? whole + "." + frac : whole;
+} catch (eFrom) {}
+}
+if (typeof BigInt !== "undefined") {
+try {
+const num = BigInt(raw);
 const divisor = BigInt(10 ** decimals);
 const whole = num / divisor;
 const remainder = num % divisor;
-const fraction = remainder.toString().padStart(decimals, '0').slice(0, 4);
+const fraction = remainder.toString().padStart(decimals, "0").slice(0, 4);
 if (remainder === 0n) return whole.toLocaleString();
-return `${whole}.${fraction}`.replace(/\.?0+$/, '');
+return (whole + "." + fraction).replace(/\.?0+$/, "");
+} catch (eBi) {}
+}
+return raw;
 }
 
 function formatDate(timestamp) {
@@ -2496,9 +2586,10 @@ return params.get('ref');
 }
 
 function getEthereumProvider() {
-if (window.ethereum?.isMetaMask) return window.ethereum;
 if (window.ethereum) return window.ethereum;
-if (window.web3?.currentProvider) return window.web3.currentProvider;
+if (window.tokenpocket && window.tokenpocket.ethereum) return window.tokenpocket.ethereum;
+if (window.tp && window.tp.ethereum) return window.tp.ethereum;
+if (window.web3 && window.web3.currentProvider) return window.web3.currentProvider;
 return null;
 }
 
@@ -2525,6 +2616,7 @@ if (!(await ensureWalletOnConfiguredChain(ethereum))) return;
 account = accounts[0];
 web3 = new Web3(ethereum);
 mainContract = new web3.eth.Contract(MAIN_ABI, CONFIG.MAIN_CONTRACT);
+await initReadProvider();
 
 document.getElementById('beforeConnect').classList.add('hidden');
 document.getElementById('mainContent').classList.remove('hidden');
@@ -2554,7 +2646,7 @@ showToast(t('contractNotConfigured'), 'error');
 const pendingRef = getReferrerFromURL();
 if (mainConfigured && pendingRef && web3.utils.isAddress(pendingRef)) {
 try {
-const myRefRaw = await mainContract.methods.referrer(account).call();
+const myRefRaw = await vc().methods.referrer(account).call();
 const myRefN = normalizeAddressResult(myRefRaw);
 if (!myRefN || isZeroContractAddress(myRefN)) {
 if (pendingRef.toLowerCase() !== account.toLowerCase()) {
@@ -2605,6 +2697,8 @@ showToast(msg, 'error');
 function disconnectWallet() {
 account = null;
 mainContract = null;
+readWeb3 = null;
+readContract = null;
 document.getElementById('beforeConnect').classList.remove('hidden');
 document.getElementById('mainContent').classList.add('hidden');
 updateStatus('', t('notConnected'));
@@ -2672,7 +2766,7 @@ return;
 
 let existingRef;
 try {
-existingRef = normalizeAddressResult(await mainContract.methods.referrer(account).call());
+existingRef = normalizeAddressResult(await vc().methods.referrer(account).call());
 } catch (e0) {
 showError(t('chainReadFailed'));
 return;
@@ -2684,7 +2778,7 @@ return;
 
 let upDex;
 try {
-upDex = await mainContract.methods.dexBuyAmount(refAddr).call();
+upDex = await vc().methods.dexBuyAmount(refAddr).call();
 } catch (e1) {
 showError(t('chainReadFailed'));
 return;
@@ -2696,7 +2790,7 @@ return;
 
 let coolUntil = '0';
 try {
-coolUntil = (await mainContract.methods.referralBindCooldown(refAddr).call()).toString();
+coolUntil = (await vc().methods.referralBindCooldown(refAddr).call()).toString();
 } catch (e2) {}
 const bn = Number(await web3.eth.getBlockNumber());
 const coolN = Number(coolUntil);
@@ -2706,7 +2800,7 @@ return;
 }
 
 try {
-await mainContract.methods.bindReferrer(refAddr).call({ from: account });
+await vc().methods.bindReferrer(refAddr).call({ from: account });
 } catch (e3) {
 console.error('bindReferrer preflight', e3);
 showError(translateError(e3));
@@ -2744,21 +2838,29 @@ const btn = document.getElementById('refreshBtn');
 if (btn) btn.classList.add('spinning');
 isLoading = true;
 
-try {
-await refreshReferrerRow();
-await mainContract.methods.name().call();
+let okBalance = false;
 
 try {
-const balanceQuick = await mainContract.methods.balanceOf(account).call();
+await refreshReferrerRow();
+
+try {
+const balanceQuick = await vc().methods.balanceOf(account).call();
 setElText('userBalance', formatToken(balanceQuick));
+okBalance = true;
 } catch (eBal) {
 console.warn('balanceOf', eBal);
 setElText('userBalance', '--');
 }
 
-const cpRaw = await mainContract.methods.currentPhase().call();
+try {
+await vc().methods.name().call();
+} catch (eName) {
+console.warn('name()', eName);
+}
+
+const cpRaw = await vc().methods.currentPhase().call();
 const phaseNum = Number(cpRaw);
-const phaseEnded = await mainContract.methods.currentPhaseEnded().call();
+const phaseEnded = await vc().methods.currentPhaseEnded().call();
 
 let homePhaseText = tf('userPhaseFmt', { phase: phaseNum });
 if (phaseEnded) {
@@ -2774,7 +2876,7 @@ if (el) el.classList.toggle('active', i + 1 === phaseNum);
 const phaseKey = Number(cpRaw);
 for (let tierId = 0; tierId < 3; tierId++) {
 try {
-const tier = await mainContract.methods.phaseTiers(phaseKey, tierId).call();
+const tier = await vc().methods.phaseTiers(phaseKey, tierId).call();
 const upMin = tier.upMin != null ? tier.upMin : tier[0];
 const downMin = tier.downMin != null ? tier.downMin : tier[1];
 setElText('tierUp' + tierId, formatToken(String(upMin)));
@@ -2786,28 +2888,32 @@ setElText('tierDown' + tierId, '--');
 }
 }
 
-const burned = await mainContract.methods.getBurnedAmount().call();
-const supply = await mainContract.methods.totalSupply().call();
-let circBn = BigInt(supply) - BigInt(burned);
-if (circBn < 0n) circBn = 0n;
+const burned = await vc().methods.getBurnedAmount().call();
+const supply = await vc().methods.totalSupply().call();
+let circStr = String(supply);
+if (web3 && web3.utils) {
+const sBn = web3.utils.toBN(supply);
+const bBn = web3.utils.toBN(burned);
+circStr = sBn.gt(bBn) ? sBn.sub(bBn).toString(10) : "0";
+}
 
 setElText('burnedAmount', formatToken(String(burned)));
-setElText('circulating', formatToken(circBn.toString()));
+setElText('circulating', formatToken(circStr));
 
 await refreshBurnProgressDisplay(String(burned), phaseNum);
 
-const userPhase = await mainContract.methods.getUserPhase(account).call();
+const userPhase = await vc().methods.getUserPhase(account).call();
 const uph = Number(userPhase);
 setElText('userPhase', uph === 0 ? t('userPhaseNewLabel') : tf('userPhaseFmt', { phase: uph }));
 
-const holdInfo = await mainContract.methods.getUserHoldInfo(account).call();
+const holdInfo = await vc().methods.getUserHoldInfo(account).call();
 setElText('holdThreshold', formatToken(String(holdInfo[0])));
 setElText('holdStartTime', formatDate(holdInfo[1]));
 setElText('holdEndTime', formatDate(holdInfo[2]));
 const hq = holdInfo[3] === true || holdInfo[3] === 'true';
 setElText('holdQualified', hq ? t('holdYes') : t('holdNo'));
 
-const dexBuy = await mainContract.methods.dexBuyAmount(account).call();
+const dexBuy = await vc().methods.dexBuyAmount(account).call();
 setElText('dexBuy', formatToken(String(dexBuy)));
 
 try {
@@ -2820,7 +2926,7 @@ console.warn('loadLockData', lockErr);
 console.error('获取数据失败:', error);
 burnProgressSnapshot = null;
 renderBurnProgressFromSnapshot();
-if (!opts.silentOnReadFailure) {
+if (!okBalance && !opts.silentOnReadFailure) {
 showToast(t('chainReadFailed'), 'error');
 }
 } finally {
@@ -2832,7 +2938,7 @@ isLoading = false;
 async function loadLockData() {
 try {
 const ZERO = '0x0000000000000000000000000000000000000000';
-const onChain = await mainContract.methods.lockContract().call();
+const onChain = await vc().methods.lockContract().call();
 let lockAddr = onChain;
 const fb = CONFIG.LOCK_CONTRACT;
 if ((!lockAddr || String(lockAddr).toLowerCase() === ZERO.toLowerCase()) && fb && String(fb).toLowerCase() !== ZERO.toLowerCase()) {
@@ -2840,19 +2946,14 @@ lockAddr = fb;
 }
 
 if (lockAddr && String(lockAddr).toLowerCase() !== ZERO.toLowerCase()) {
-lockContract = new web3.eth.Contract(LOCK_ABI, lockAddr);
+lockContract = new (readWeb3 || web3).eth.Contract(LOCK_ABI, lockAddr);
 
 const stats = await lockContract.methods.getDashboardStats().call();
 
-const privateLockTotal = BigInt(stats.privateLockTotal ?? stats[0]);
-const privateReleased = BigInt(stats.privateReleased ?? stats[1]);
-const projectLockTotal = BigInt(stats.projectLockTotal ?? stats[2]);
-const projectReleased = BigInt(stats.projectReleased ?? stats[3]);
-
-document.getElementById('privateLockTotal').textContent = formatToken(privateLockTotal.toString());
-document.getElementById('privateReleased').textContent = formatToken(privateReleased.toString());
-document.getElementById('projectLockTotal').textContent = formatToken(projectLockTotal.toString());
-document.getElementById('projectReleased').textContent = formatToken(projectReleased.toString());
+document.getElementById('privateLockTotal').textContent = formatToken(String(stats.privateLockTotal ?? stats[0]));
+document.getElementById('privateReleased').textContent = formatToken(String(stats.privateReleased ?? stats[1]));
+document.getElementById('projectLockTotal').textContent = formatToken(String(stats.projectLockTotal ?? stats[2]));
+document.getElementById('projectReleased').textContent = formatToken(String(stats.projectReleased ?? stats[3]));
 }
 } catch (error) {
 console.error('获取锁仓数据失败:', error);
@@ -2911,7 +3012,7 @@ async function loadDownlines() {
 if (!mainContract || isZeroContractAddress(CONFIG.MAIN_CONTRACT)) return;
 
 try {
-const downlines = await mainContract.methods.downlines(account).call();
+const downlines = await vc().methods.downlines(account).call();
 
 if (downlines.length === 0) {
 renderDownlineListEmpty();
@@ -2919,18 +3020,18 @@ return;
 }
 
 const rows = [];
-const currentPhase = await mainContract.methods.currentPhase().call();
-const myHold = await mainContract.methods.getCurrentPhaseNetHold(account).call();
+const currentPhase = await vc().methods.currentPhase().call();
+const myHold = await vc().methods.getCurrentPhaseNetHold(account).call();
 
 for (const downline of downlines) {
-const tierClaimed = await mainContract.methods.tierClaimed(account, downline, currentPhase).call();
-const downHold = await mainContract.methods.getCurrentPhaseNetHold(downline).call();
+const tierClaimed = await vc().methods.tierClaimed(account, downline, currentPhase).call();
+const downHold = await vc().methods.getCurrentPhaseNetHold(downline).call();
 
 let status = 'inactive';
 let statusText = t('notQualified');
 
 for (let tierId = 0; tierId < 3; tierId++) {
-const tier = await mainContract.methods.phaseTiers(currentPhase, tierId).call();
+const tier = await vc().methods.phaseTiers(currentPhase, tierId).call();
 const upMin = tier.upMin != null ? tier.upMin : tier[0];
 const downMin = tier.downMin != null ? tier.downMin : tier[1];
 if ((tierClaimed & (1 << tierId)) === 0) {
@@ -3031,15 +3132,15 @@ claimLog.style.display = 'none';
 txPipelineBusy = true;
 try {
 try {
-const downlines = await mainContract.methods.downlines(account).call();
+const downlines = await vc().methods.downlines(account).call();
 
 if (downlines.length === 0) {
 addLog(t('noDownlineToClaim'), 'info');
 return;
 }
 
-const currentPhase = await mainContract.methods.currentPhase().call();
-const myHold = await mainContract.methods.getCurrentPhaseNetHold(account).call();
+const currentPhase = await vc().methods.currentPhase().call();
+const myHold = await vc().methods.getCurrentPhaseNetHold(account).call();
 
 let successCount = 0;
 let failCount = 0;
@@ -3049,13 +3150,13 @@ addLog(t('startClaiming'), 'info');
 addLog(tf('logPhaseLineFmt', { phase: currentPhase, count: downlines.length }), 'info');
 
 for (const downline of downlines) {
-const tierClaimed = await mainContract.methods.tierClaimed(account, downline, currentPhase).call();
-const downHold = await mainContract.methods.getCurrentPhaseNetHold(downline).call();
+const tierClaimed = await vc().methods.tierClaimed(account, downline, currentPhase).call();
+const downHold = await vc().methods.getCurrentPhaseNetHold(downline).call();
 
 for (let tierId = 0; tierId < 3; tierId++) {
 if ((tierClaimed & (1 << tierId)) !== 0) continue;
 
-const tier = await mainContract.methods.phaseTiers(currentPhase, tierId).call();
+const tier = await vc().methods.phaseTiers(currentPhase, tierId).call();
 const upMin = tier.upMin != null ? tier.upMin : tier[0];
 const downMin = tier.downMin != null ? tier.downMin : tier[1];
 if (Number(downHold) < Number(downMin) || Number(myHold) < Number(upMin)) continue;
@@ -3209,8 +3310,9 @@ currentLang = savedLang;
 applyTranslations();
 updateLangMenuUI();
 
-if (typeof window.ethereum !== 'undefined') {
-const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+const ethAuto = getEthereumProvider();
+if (ethAuto) {
+const accounts = await ethAuto.request({ method: 'eth_accounts' });
 if (accounts.length > 0) {
 await connectWallet();
 }
