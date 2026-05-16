@@ -575,6 +575,7 @@ border: 1px solid rgba(99, 102, 241, 0.2);
 
 .lang-menu-list.open {
 display: block;
+pointer-events: auto;
 }
 
 .lang-menu-row {
@@ -988,15 +989,16 @@ flex-wrap: wrap;
 <span class="lang-flag" id="langTriggerFlag">🌐</span>
 <span class="lang-short" id="langTriggerShort">TW</span>
 <span style="flex:1;text-align:left;opacity:0.85;font-size:13px;" id="langTriggerLabel">繁體中文</span>
-<span class="lang-chevron"></span>
+<span class="lang-chevron" aria-hidden="true">▼</span>
 </button>
 <div class="lang-menu-list" id="langMenuList">
-<button type="button" class="lang-menu-row" data-lang="zh-TW"><span>🇹🇼</span><span>繁體中文</span><span style="margin-left:auto;opacity:0.5;font-size:12px;">TW</span></button>
-<button type="button" class="lang-menu-row" data-lang="en"><span>🇬🇧</span><span>English</span><span style="margin-left:auto;opacity:0.5;font-size:12px;">EN</span></button>
-<button type="button" class="lang-menu-row" data-lang="ja"><span>🇯🇵</span><span>日本語</span><span style="margin-left:auto;opacity:0.5;font-size:12px;">JP</span></button>
-<button type="button" class="lang-menu-row" data-lang="ko"><span>🇰🇷</span><span>한국</span><span style="margin-left:auto;opacity:0.5;font-size:12px;">KR</span></button>
-<button type="button" class="lang-menu-row" data-lang="vi"><span>🇻🇳</span><span>Tiếng Việt</span><span style="margin-left:auto;opacity:0.5;font-size:12px;">VI</span></button>
-<button type="button" class="lang-menu-row" data-lang="th"><span>🇹🇭</span><span>ไทย</span><span style="margin-left:auto;opacity:0.5;font-size:12px;">TH</span></button>
+<button type="button" class="lang-menu-row" data-lang="zh-CN" onclick="setLanguage('zh-CN')"><span>🇨🇳</span><span>简体中文</span><span style="margin-left:auto;opacity:0.5;font-size:12px;">CN</span></button>
+<button type="button" class="lang-menu-row" data-lang="zh-TW" onclick="setLanguage('zh-TW')"><span>🇹🇼</span><span>繁體中文</span><span style="margin-left:auto;opacity:0.5;font-size:12px;">TW</span></button>
+<button type="button" class="lang-menu-row" data-lang="en" onclick="setLanguage('en')"><span>🇬🇧</span><span>English</span><span style="margin-left:auto;opacity:0.5;font-size:12px;">EN</span></button>
+<button type="button" class="lang-menu-row" data-lang="ja" onclick="setLanguage('ja')"><span>🇯🇵</span><span>日本語</span><span style="margin-left:auto;opacity:0.5;font-size:12px;">JP</span></button>
+<button type="button" class="lang-menu-row" data-lang="ko" onclick="setLanguage('ko')"><span>🇰🇷</span><span>한국어</span><span style="margin-left:auto;opacity:0.5;font-size:12px;">KR</span></button>
+<button type="button" class="lang-menu-row" data-lang="vi" onclick="setLanguage('vi')"><span>🇻🇳</span><span>Tiếng Việt</span><span style="margin-left:auto;opacity:0.5;font-size:12px;">VI</span></button>
+<button type="button" class="lang-menu-row" data-lang="th" onclick="setLanguage('th')"><span>🇹🇭</span><span>ไทย</span><span style="margin-left:auto;opacity:0.5;font-size:12px;">TH</span></button>
 </div>
 <p class="menu-hint" data-i18n="menuLangHint">选择语言后界面将立即切换。若 TokenPocket 内无反应，请尝试刷新页面</p>
 </div>
@@ -1494,13 +1496,6 @@ privateReleased: 'Private Released Total',
 projectData: 'Project Data',
 projectLockTotal: 'Project Lock Total',
 projectReleased: 'Project Released Total',
-lockAutoRelease: 'Auto release (vested)',
-lockAutoReleaseHint: 'Releases vested private + project tokens to fixed wallets. Network-wide cooldown: once per 12 hours.',
-lockAutoReleaseBtn: 'Run autoReleaseAll',
-lockCooldownFmt: 'Cooldown: ~{h}h {m}m remaining',
-lockCooldownReady: 'Ready to trigger auto release',
-lockAutoReleaseOk: 'Auto release submitted',
-errAutoReleaseCooldown: 'autoReleaseAll is on cooldown (once per 12 hours)',
 referralLink: 'Referral Link',
 copyLink: 'Copy',
 bindReferrer: 'Bind',
@@ -1550,14 +1545,14 @@ referrerStatusLabel: 'Referrer',
 holdQualifiedLabel: 'Hold qualified',
 referrerBound: 'Bound',
 referrerNotBound: 'Not bound',
-holdYes: '?Yes',
-holdNo: '?No',
+holdYes: '✅ Yes',
+holdNo: '❌ No',
 userPhaseNewLabel: 'New user',
 claimLogTitle: 'Activity log',
 refreshModalTitle: 'Refresh info',
 logTryClaimFmt: 'Claiming {addr} tier {tier}',
-logTierOkFmt: '?Tier {tier} success',
-logTierFailFmt: '?Tier {tier} failed: {msg}',
+logTierOkFmt: '✓ Tier {tier} success',
+logTierFailFmt: '✗ Tier {tier} failed: {msg}',
 logDoneFmt: 'Done. OK: {ok}, failed: {fail}',
 logPhaseLineFmt: 'Phase: {phase}, downlines: {count}',
 userRejectConnect: 'User rejected connection',
@@ -1597,7 +1592,7 @@ wrongNetworkStrict: 'Wrong network: switch to BSC in your wallet, then reconnect
 contractNotConfigured: 'Main contract address is not set; on-chain data unavailable (set CONFIG.MAIN_CONTRACT after deploy).',
 zeroAddressNotAllowed: 'Zero address is not allowed.',
 cannotBindSelf: 'You cannot bind yourself as referrer.',
-txPending: 'Transaction submitted, waiting for confirmation?,
+txPending: 'Transaction submitted, waiting for confirmation…',
 duplicateActionWait: 'Please wait for the previous transaction to finish.',
 errUplineNoDex: 'This address has no qualifying DEX buy and cannot be a referrer.',
 errUplineCooldownFmt: 'This referrer is in bind cooldown. Try again after block height exceeds {block}.',
@@ -1605,14 +1600,14 @@ chainReadFailed: 'On-chain read failed. Check network, contract address, or brow
 },
 ja: {
 pageTitle: 'XYL トークン',
-selectLanguage: '言?,
+selectLanguage: '言語',
 menuTitle: 'メニュー',
-languageSection: '言?,
-menuLangHint: '言語を選ぶとすぐに反映されます。TokenPocket で変化がない場合はページを再読み込みしてください?,
-connectWallet: 'ウォレット接?,
+languageSection: '言語',
+menuLangHint: '言語を選ぶとすぐに反映されます。TokenPocket で変化がない場合はページを再読み込みしてください。',
+connectWallet: 'ウォレット接続',
 disconnectWallet: '切断',
-tabHome: 'ホー?,
-tabLock: 'ロッ?,
+tabHome: 'ホーム',
+tabLock: 'ロック',
 tabReferral: '紹介',
 tabInfo: 'マイ',
 phaseProgress: '段階進捗',
@@ -1624,34 +1619,34 @@ reward3Percent: '3% 報酬',
 reward5Percent: '5% 報酬',
 currentPhaseRewardDesc: '現在のア актив段階報酬説明',
 tier: 'グレード',
-superiorThreshold: '上位者门?,
-subordinateThreshold: '下位者门?,
+superiorThreshold: '上位者门槛',
+subordinateThreshold: '下位者门槛',
 tierOne: 'グレード1',
 tierTwo: 'グレード2',
 tierThree: 'グレード3',
-threshold300M: '300?,
-threshold150M: '150?,
-threshold80M: '80?,
-threshold50M: '50?,
-threshold10M: '10?,
-contractData: 'コントラクトデー?,
+threshold300M: '300万',
+threshold150M: '150万',
+threshold80M: '80万',
+threshold50M: '50万',
+threshold10M: '10万',
+contractData: 'コントラクトデータ',
 burnedAmount: 'バーン量',
 circulatingSupply: '流通供給量',
-lockData: 'ロッ?,
-projectData: 'プロジェクトデー?,
-referralLink: '紹介リン?,
-copyLink: 'コピ?,
+lockData: 'ロック',
+projectData: 'プロジェクトデータ',
+referralLink: '紹介リンク',
+copyLink: 'コピー',
 bindReferrer: 'バインド',
-referralLinkPlaceholder: '紹介リン?,
+referralLinkPlaceholder: '紹介リンク',
 referrerPlaceholder: '紹介者アドレスを入力',
 referralRewardClaim: '紹介報酬請求',
-refreshAll: '一括更?,
-claimAll: '一括請?,
-noDownline: '下位者な?,
+refreshAll: '一括更新',
+claimAll: '一括請求',
+noDownline: '下位者なし',
 notQualified: '未達',
 claimable: '請求可能',
-claimedAll: '請求?,
-myWallet: 'マイウォレッ?,
+claimedAll: '請求済',
+myWallet: 'マイウォレット',
 tokenBalance: 'トークン残高',
 totalDexBuy: 'DEX購入合計',
 holdStatus: '保有状態',
@@ -1664,94 +1659,94 @@ lastRefresh: '前回更新',
 nextRefresh: '次回更新',
 confirm: '確認',
 installWallet: 'MetaMask、TokenPocketなどのWeb3ウォレットをインストールしてください',
-switchToBSC: 'BSCメインネットに手動で切り替えてくださ?,
-autoBindReferrer: '紹介者を自動バインド?..',
+switchToBSC: 'BSCメインネットに手動で切り替えてください',
+autoBindReferrer: '紹介者を自動バインド中...',
 bindSuccess: '紹介者バインド成功！',
 connectFirst: '先にウォレットを接続してください',
 copySuccess: 'コピー成功！',
-bindSuccessToast: 'バインド成功?,
+bindSuccessToast: 'バインド成功！',
 waitToRefresh: '更新まで{minutes}分お待ちください',
 waitToClaim: '請求まで{minutes}分お待ちください',
 noDownlineToClaim: '請求可能な下位者がいません',
 startClaiming: '一括請求を開始...',
-userCancelled: 'ユーザーがサインをキャンセル、請求中?,
-noClaimableReward: '現在請求可能な報酬はありませ?,
-downline: '下位?,
+userCancelled: 'ユーザーがサインをキャンセル、請求中止',
+noClaimableReward: '現在請求可能な報酬はありません',
+downline: '下位者',
 tierClaim: 'グレード',
 claimSuccess: '請求成功',
 claimFailed: '失敗',
-operationError: '操作エラ?,
+operationError: '操作エラー',
 chainOnPhase: 'オンチェーン段階',
-phaseEndedBadge: '（焼却目標達成、次段階待ち?,
-referrerStatusLabel: '紹介?,
+phaseEndedBadge: '（焼却目標達成、次段階待ち）',
+referrerStatusLabel: '紹介者',
 holdQualifiedLabel: '保有条件',
 referrerBound: '紐付け済',
 referrerNotBound: '未紐付け',
-holdYes: '?達成',
-holdNo: '?未達',
+holdYes: '✅ 達成',
+holdNo: '❌ 未達',
 userPhaseNewLabel: '新規ユーザー',
 claimLogTitle: 'ログ',
 refreshModalTitle: '更新情報',
-logTryClaimFmt: '{addr} ティア{tier} を請?,
-logTierOkFmt: '?ティア{tier} 成功',
-logTierFailFmt: '?ティア{tier} 失敗: {msg}',
+logTryClaimFmt: '{addr} ティア{tier} を請求',
+logTierOkFmt: '✓ ティア{tier} 成功',
+logTierFailFmt: '✗ ティア{tier} 失敗: {msg}',
 logDoneFmt: '完了 成功:{ok} 失敗:{fail}',
 logPhaseLineFmt: '段階:{phase} 下位:{count}',
-userRejectConnect: '接続がキャンセルされまし?,
+userRejectConnect: '接続がキャンセルされました',
 walletDenied: 'ウォレット未承認',
 invalidAddress: '有効なアドレスを入力してください',
 userPhaseFmt: '段階{phase}',
 burnProgressThisPhase: '現段階バーン進捗',
 burnProgressTotal: '全期間バーン進捗',
 burnProgressFmt: '{cur} / {target} · {pct}%',
-err24hHold: '24時間保有条件を満たしていませ?,
+err24hHold: '24時間保有条件を満たしていません',
 errTierTimer: 'ティア保有タイマー未開始',
 errTierClaimed: 'このティアは既に請求済み',
-errDownHold: '下位の保有量が不?,
-errUpHold: '上位の保有量が不?,
+errDownHold: '下位の保有量が不足',
+errUpHold: '上位の保有量が不足',
 errHoldQualified: '保有が不十分',
 errAlreadyBound: '紹介者は既に登録済み',
-errInvalidReferrer: '無効な紹介?,
-errSelfRef: '自分を紹介者にできませ?,
+errInvalidReferrer: '無効な紹介者',
+errSelfRef: '自分を紹介者にできません',
 errNoBuy: '下位に条件を満たすDEX買いがありません',
 errTooSoon: '操作が早すぎます',
 errInvalidTier: '無効なティア',
 errNotReferrer: 'この下位の紹介者ではありません',
-errOldUserClear: 'レガシーユーザーは先にポジション整理が必?,
+errOldUserClear: 'レガシーユーザーは先にポジション整理が必要',
 errAlreadyClaimed: '既に請求済み',
 errNotQualified: '条件未達',
 errInsufficientBalance: '残高不足',
-errTransferFailed: '転送失?,
-errUnauthorized: '未承?,
+errTransferFailed: '転送失敗',
+errUnauthorized: '未承認',
 errAlreadySigned: '署名済み',
-errNotEnoughSigs: '署名数不?,
-errInvalidAddress: '無効なアドレ?,
+errNotEnoughSigs: '署名数不足',
+errInvalidAddress: '無効なアドレス',
 errUserRejected: '署名が拒否されました',
 errRevertFmt: 'リバート: {reason}',
 errUnknownFmt: '{detail}',
-logErrorFmt: 'エラ? {msg}',
-wrongNetworkStrict: 'ネットワークが正しくありません。ウォレットでBSCに切り替えてから再接続してください?,
-contractNotConfigured: 'メインコントラクトアドレスが未設定のため、オンチェーンデータを取得できません（デプロイ後にCONFIG.MAIN_CONTRACTを設定）?,
-zeroAddressNotAllowed: 'ゼロアドレスは使用できません?,
-cannotBindSelf: '自分自身を紹介者にすることはできません?,
-txPending: 'トランザクションを送信しました。確認を待っています?,
-duplicateActionWait: '前のトランザクションが完了するまでお待ちください?,
-errUplineNoDex: 'この紹介者には条件を満たすDEX買いがなく、紹介者にできません?,
-errUplineCooldownFmt: '紹介者はバインド冷却中です。ブロック高?{block} を超えてから再試行してください?,
-chainReadFailed: 'オンチェーンの読み取りに失敗しました。ネットワーク・コントラクト・CSPを確認してください?
+logErrorFmt: 'エラー: {msg}',
+wrongNetworkStrict: 'ネットワークが正しくありません。ウォレットでBSCに切り替えてから再接続してください。',
+contractNotConfigured: 'メインコントラクトアドレスが未設定のため、オンチェーンデータを取得できません（デプロイ後にCONFIG.MAIN_CONTRACTを設定）。',
+zeroAddressNotAllowed: 'ゼロアドレスは使用できません。',
+cannotBindSelf: '自分自身を紹介者にすることはできません。',
+txPending: 'トランザクションを送信しました。確認を待っています…',
+duplicateActionWait: '前のトランザクションが完了するまでお待ちください。',
+errUplineNoDex: 'この紹介者には条件を満たすDEX買いがなく、紹介者にできません。',
+errUplineCooldownFmt: '紹介者はバインド冷却中です。ブロック高が {block} を超えてから再試行してください。',
+chainReadFailed: 'オンチェーンの読み取りに失敗しました。ネットワーク・コントラクト・CSPを確認してください。'
 },
 ko: {
 pageTitle: 'XYL 토큰',
 selectLanguage: '언어',
 menuTitle: '메뉴',
 languageSection: '언어',
-menuLangHint: '언어?선택하면 즉시 적용됩니? TokenPocket에서 반응?없으?새로고침하세?',
-connectWallet: '지?연결',
+menuLangHint: '언어를 선택하면 즉시 적용됩니다. TokenPocket에서 반응이 없으면 새로고침하세요.',
+connectWallet: '지갑 연결',
 disconnectWallet: '연결 해제',
-tabHome: '?,
+tabHome: '홈',
 tabLock: '잠금',
 tabReferral: '추천',
-tabInfo: '?정보',
+tabInfo: '내 정보',
 phaseProgress: '단계 진행',
 phase1: '단계 1',
 phase2: '단계 2',
@@ -1766,137 +1761,137 @@ subordinateThreshold: '하위门槛',
 tierOne: '등급 1',
 tierTwo: '등급 2',
 tierThree: '등급 3',
-threshold300M: '300?,
-threshold150M: '150?,
-threshold80M: '80?,
-threshold50M: '50?,
-threshold10M: '10?,
-contractData: '컨트랙트 데이?,
-burnedAmount: '소각?,
-circulatingSupply: '순환 공급?,
+threshold300M: '300만',
+threshold150M: '150만',
+threshold80M: '80만',
+threshold50M: '50만',
+threshold10M: '10만',
+contractData: '컨트랙트 데이터',
+burnedAmount: '소각량',
+circulatingSupply: '순환 공급량',
 lockData: '잠금',
-projectData: '프로젝트 데이?,
+projectData: '프로젝트 데이터',
 referralLink: '추천 링크',
 copyLink: '복사',
-bindReferrer: '바인?,
+bindReferrer: '바인드',
 referralLinkPlaceholder: '추천 링크',
-referrerPlaceholder: '추천?주소 입력',
+referrerPlaceholder: '추천인 주소 입력',
 referralRewardClaim: '추천 보상 청구',
 refreshAll: '모두 새로고침',
 claimAll: '모두 청구',
-noDownline: '하위 사용?없음',
+noDownline: '하위 사용자 없음',
 notQualified: '미달',
-claimable: '청구 가?,
+claimable: '청구 가능',
 claimedAll: '청구 완료',
-myWallet: '?지?,
+myWallet: '내 지갑',
 tokenBalance: '토큰 잔액',
-totalDexBuy: '?DEX 구매',
+totalDexBuy: '총 DEX 구매',
 holdStatus: '보유 상태',
 currentHoldThreshold: '현재 보유门槛',
 holdStartTime: '보유 시작 시간',
 unlockTime24h: '24시간 잠금 해제 시간',
-userPhase: '사용?단계',
+userPhase: '사용자 단계',
 refreshInfo: '새로고침 정보',
-lastRefresh: '마지?새로고침',
+lastRefresh: '마지막 새로고침',
 nextRefresh: '다음 새로고침',
 confirm: '확인',
-installWallet: 'MetaMask, TokenPocket 또는 다른 Web3 지갑을 설치?주세?,
-switchToBSC: 'BSC 메인넷으?수동 전환?주세?,
-autoBindReferrer: '추천?자동 바인??..',
-bindSuccess: '추천?바인?성공!',
-connectFirst: '먼저 지갑을 연결?주세?,
+installWallet: 'MetaMask, TokenPocket 또는 다른 Web3 지갑을 설치해 주세요',
+switchToBSC: 'BSC 메인넷으로 수동 전환해 주세요',
+autoBindReferrer: '추천인 자동 바인드 중...',
+bindSuccess: '추천인 바인딩 성공!',
+connectFirst: '먼저 지갑을 연결해 주세요',
 copySuccess: '복사 성공!',
-bindSuccessToast: '바인?성공!',
-waitToRefresh: '{minutes}?후에 새로고침?주세?,
-waitToClaim: '{minutes}?후에 청구?주세?,
-noDownlineToClaim: '청구?하위 사용자가 없습니다',
-startClaiming: '원클?청구 시작...',
-userCancelled: '사용자가 서명?취소하여 청구 중지',
-noClaimableReward: '현재 청구 가능한 보상?없습니다',
+bindSuccessToast: '바인딩 성공!',
+waitToRefresh: '{minutes}분 후에 새로고침해 주세요',
+waitToClaim: '{minutes}분 후에 청구해 주세요',
+noDownlineToClaim: '청구할 하위 사용자가 없습니다',
+startClaiming: '원클릭 청구 시작...',
+userCancelled: '사용자가 서명을 취소하여 청구 중지',
+noClaimableReward: '현재 청구 가능한 보상이 없습니다',
 downline: '하위',
 tierClaim: '등급',
 claimSuccess: '청구 성공',
 claimFailed: '실패',
 operationError: '작업 오류',
-chainOnPhase: '온체?단계',
-phaseEndedBadge: '(소각 목표 달성, 다음 단계 대?',
-referrerStatusLabel: '추천?,
+chainOnPhase: '온체인 단계',
+phaseEndedBadge: '(소각 목표 달성, 다음 단계 대기)',
+referrerStatusLabel: '추천인',
 holdQualifiedLabel: '보유 자격',
-referrerBound: '연결?,
-referrerNotBound: '미연?,
-holdYes: '?충족',
-holdNo: '?미충?,
+referrerBound: '연결됨',
+referrerNotBound: '미연결',
+holdYes: '✅ 충족',
+holdNo: '❌ 미충족',
 userPhaseNewLabel: '신규',
 claimLogTitle: '로그',
 refreshModalTitle: '새로고침',
-logTryClaimFmt: '{addr} {tier}?청구',
-logTierOkFmt: '?{tier}?성공',
-logTierFailFmt: '?{tier}?실패: {msg}',
+logTryClaimFmt: '{addr} {tier}단 청구',
+logTierOkFmt: '✓ {tier}단 성공',
+logTierFailFmt: '✗ {tier}단 실패: {msg}',
 logDoneFmt: '완료 성공:{ok} 실패:{fail}',
 logPhaseLineFmt: '단계:{phase} 하위:{count}',
 userRejectConnect: '연결 거부',
-walletDenied: '지?미승?,
-invalidAddress: '유효?주소?입력하세?,
+walletDenied: '지갑 미승인',
+invalidAddress: '유효한 주소를 입력하세요',
 userPhaseFmt: '단계 {phase}',
 burnProgressThisPhase: '현재 단계 소각 진행',
 burnProgressTotal: '전체 주기 소각 진행',
 burnProgressFmt: '{cur} / {target} · {pct}%',
-err24hHold: '24시간 보유 조건 미충?,
-errTierTimer: '티어 보유 타이머 미시?,
-errTierClaimed: '해당 티어 이미 청구?,
-errDownHold: '하위 보유?부?,
-errUpHold: '상위 보유?부?,
+err24hHold: '24시간 보유 조건 미충족',
+errTierTimer: '티어 보유 타이머 미시작',
+errTierClaimed: '해당 티어 이미 청구됨',
+errDownHold: '하위 보유량 부족',
+errUpHold: '상위 보유량 부족',
 errHoldQualified: '보유 자격 미달',
-errAlreadyBound: '이미 추천?연결?,
-errInvalidReferrer: '유효하지 않은 추천?,
-errSelfRef: '본인?추천인으?지정할 ?없음',
-errNoBuy: '하위?조건 충족 DEX 매수 없음',
-errTooSoon: '너무 빠른 재시?,
+errAlreadyBound: '이미 추천인 연결됨',
+errInvalidReferrer: '유효하지 않은 추천인',
+errSelfRef: '본인을 추천인으로 지정할 수 없음',
+errNoBuy: '하위에 조건 충족 DEX 매수 없음',
+errTooSoon: '너무 빠른 재시도',
 errInvalidTier: '유효하지 않은 티어',
-errNotReferrer: '해당 하위?추천인이 아님',
+errNotReferrer: '해당 하위의 추천인이 아님',
 errOldUserClear: '기존 사용자는 먼저 정리 필요',
-errAlreadyClaimed: '이미 청구?,
-errNotQualified: '조건 미충?,
-errInsufficientBalance: '잔액 부?,
+errAlreadyClaimed: '이미 청구함',
+errNotQualified: '조건 미충족',
+errInsufficientBalance: '잔액 부족',
 errTransferFailed: '전송 실패',
-errUnauthorized: '미승?,
+errUnauthorized: '미승인',
 errAlreadySigned: '이미 서명',
-errNotEnoughSigs: '서명 ?부?,
+errNotEnoughSigs: '서명 수 부족',
 errInvalidAddress: '유효하지 않은 주소',
 errUserRejected: '사용자가 서명 거부',
-errRevertFmt: '되돌? {reason}',
+errRevertFmt: '되돌림: {reason}',
 errUnknownFmt: '{detail}',
 logErrorFmt: '오류: {msg}',
-wrongNetworkStrict: '네트워크가 올바르지 않습니다. 지갑에?BSC?전환??다시 연결하세?',
-contractNotConfigured: '메인 컨트랙트 주소가 설정되지 않아 온체?데이터를 불러??없습니다(배포 ?CONFIG.MAIN_CONTRACT 설정).',
-zeroAddressNotAllowed: '?0) 주소?사용??없습니다.',
-cannotBindSelf: '자기 자신?추천인으?설정??없습니다.',
-txPending: '트랜잭션?전송되었습니? 확인?기다리는 중?,
-duplicateActionWait: '이전 트랜잭션?완료?때까지 기다?주세?',
-errUplineNoDex: '해당 추천인에게는 유효?DEX 매수 기록?없어 추천인이 ??없습니다.',
-errUplineCooldownFmt: '추천인이 바인?쿨다?중입니다. 블록 높이가 {block} ?넘긴 ?다시 시도하세?',
-chainReadFailed: '온체?읽기 실패. 네트워크·컨트랙트·브라우저 CSP?확인하세?'
+wrongNetworkStrict: '네트워크가 올바르지 않습니다. 지갑에서 BSC로 전환한 뒤 다시 연결하세요.',
+contractNotConfigured: '메인 컨트랙트 주소가 설정되지 않아 온체인 데이터를 불러올 수 없습니다(배포 후 CONFIG.MAIN_CONTRACT 설정).',
+zeroAddressNotAllowed: '영(0) 주소는 사용할 수 없습니다.',
+cannotBindSelf: '자기 자신을 추천인으로 설정할 수 없습니다.',
+txPending: '트랜잭션이 전송되었습니다. 확인을 기다리는 중…',
+duplicateActionWait: '이전 트랜잭션이 완료될 때까지 기다려 주세요.',
+errUplineNoDex: '해당 추천인에게는 유효한 DEX 매수 기록이 없어 추천인이 될 수 없습니다.',
+errUplineCooldownFmt: '추천인이 바인딩 쿨다운 중입니다. 블록 높이가 {block} 을 넘긴 후 다시 시도하세요.',
+chainReadFailed: '온체인 읽기 실패. 네트워크·컨트랙트·브라우저 CSP를 확인하세요.'
 },
 vi: {
 pageTitle: 'XYL Token',
-selectLanguage: 'Ngôn ng?,
+selectLanguage: 'Ngôn ngữ',
 menuTitle: 'Menu',
-languageSection: 'Ngôn ng?,
+languageSection: 'Ngôn ngữ',
 menuLangHint: 'Giao diện cập nhật ngay. Nếu TokenPocket không đổi, hãy tải lại trang.',
 connectWallet: 'Kết nối Ví',
 disconnectWallet: 'Ngắt kết nối',
-tabHome: 'Trang ch?,
+tabHome: 'Trang chủ',
 tabLock: 'Khóa',
 tabReferral: 'Giới thiệu',
 tabInfo: 'Của tôi',
-phaseProgress: 'Tiến đ?Giai đoạn',
+phaseProgress: 'Tiến độ Giai đoạn',
 phase1: 'Giai đoạn 1',
 phase2: 'Giai đoạn 2',
 phase3: 'Giai đoạn 3',
 reward1Percent: '1% Phần thưởng',
 reward3Percent: '3% Phần thưởng',
 reward5Percent: '5% Phần thưởng',
-currentPhaseRewardDesc: 'Mô t?Phần thưởng Giai đoạn Hiện tại',
+currentPhaseRewardDesc: 'Mô tả Phần thưởng Giai đoạn Hiện tại',
 tier: 'Cấp bậc',
 superiorThreshold: 'Ngưỡng cấp trên',
 subordinateThreshold: 'Ngưỡng cấp dưới',
@@ -1908,123 +1903,123 @@ threshold150M: '1.5M',
 threshold80M: '800K',
 threshold50M: '500K',
 threshold10M: '100K',
-contractData: 'D?liệu Hợp đồng',
+contractData: 'Dữ liệu Hợp đồng',
 burnedAmount: 'Lượng đốt',
 circulatingSupply: 'Nguồn cung lưu thông',
 lockData: 'Khóa',
-projectData: 'D?liệu D?án',
+projectData: 'Dữ liệu Dự án',
 referralLink: 'Liên kết Giới thiệu',
 copyLink: 'Sao chép',
 bindReferrer: 'Liên kết',
 referralLinkPlaceholder: 'Liên kết Giới thiệu',
-referrerPlaceholder: 'Nhập địa ch?người giới thiệu',
+referrerPlaceholder: 'Nhập địa chỉ người giới thiệu',
 referralRewardClaim: 'Nhận Phần thưởng Giới thiệu',
-refreshAll: 'Làm mới tất c?,
-claimAll: 'Nhận tất c?,
+refreshAll: 'Làm mới tất cả',
+claimAll: 'Nhận tất cả',
 noDownline: 'Không có cấp dưới',
 notQualified: 'Chưa đạt',
-claimable: 'Có th?nhận',
+claimable: 'Có thể nhận',
 claimedAll: 'Đã nhận hết',
 myWallet: 'Ví của tôi',
-tokenBalance: 'S?dư Token',
+tokenBalance: 'Số dư Token',
 totalDexBuy: 'Tổng mua DEX',
-holdStatus: 'Trạng thái nắm gi?,
-currentHoldThreshold: 'Ngưỡng nắm gi?hiện tại',
-holdStartTime: 'Thời gian bắt đầu nắm gi?,
-unlockTime24h: 'Thời gian m?khóa 24h',
+holdStatus: 'Trạng thái nắm giữ',
+currentHoldThreshold: 'Ngưỡng nắm giữ hiện tại',
+holdStartTime: 'Thời gian bắt đầu nắm giữ',
+unlockTime24h: 'Thời gian mở khóa 24h',
 userPhase: 'Giai đoạn người dùng',
 refreshInfo: 'Thông tin làm mới',
 lastRefresh: 'Lần làm mới trước',
 nextRefresh: 'Lần làm mới tiếp',
 confirm: 'Xác nhận',
 installWallet: 'Vui lòng cài đặt MetaMask, TokenPocket hoặc ví Web3 khác',
-switchToBSC: 'Vui lòng chuyển sang BSC Mainnet th?công',
-autoBindReferrer: 'Đang t?động liên kết người giới thiệu...',
+switchToBSC: 'Vui lòng chuyển sang BSC Mainnet thủ công',
+autoBindReferrer: 'Đang tự động liên kết người giới thiệu...',
 bindSuccess: 'Liên kết người giới thiệu thành công!',
 connectFirst: 'Vui lòng kết nối ví trước',
 copySuccess: 'Sao chép thành công!',
 bindSuccessToast: 'Liên kết thành công!',
 waitToRefresh: 'Vui lòng đợi {minutes} phút trước khi làm mới',
 waitToClaim: 'Vui lòng đợi {minutes} phút trước khi nhận',
-noDownlineToClaim: 'Không có cấp dưới đ?nhận',
-startClaiming: 'Bắt đầu nhận tất c?một lần...',
+noDownlineToClaim: 'Không có cấp dưới để nhận',
+startClaiming: 'Bắt đầu nhận tất cả một lần...',
 userCancelled: 'Người dùng hủy ký, dừng nhận',
-noClaimableReward: 'Hiện không có phần thưởng có th?nhận',
+noClaimableReward: 'Hiện không có phần thưởng có thể nhận',
 downline: 'cấp dưới',
 tierClaim: 'cấp',
 claimSuccess: 'Nhận thành công',
 claimFailed: 'Thất bại',
 operationError: 'Lỗi thao tác',
 chainOnPhase: 'Giai đoạn on-chain',
-phaseEndedBadge: '(đạt mục tiêu đốt, ch?giai đoạn sau)',
+phaseEndedBadge: '(đạt mục tiêu đốt, chờ giai đoạn sau)',
 referrerStatusLabel: 'Người giới thiệu',
-holdQualifiedLabel: 'Đ?điều kiện nắm gi?,
+holdQualifiedLabel: 'Đủ điều kiện nắm giữ',
 referrerBound: 'Đã liên kết',
 referrerNotBound: 'Chưa liên kết',
-holdYes: '?Đạt',
-holdNo: '?Chưa đạt',
+holdYes: '✅ Đạt',
+holdNo: '❌ Chưa đạt',
 userPhaseNewLabel: 'Người mới',
 claimLogTitle: 'Nhật ký',
 refreshModalTitle: 'Làm mới',
 logTryClaimFmt: 'Nhận {addr} tầng {tier}',
-logTierOkFmt: '?Tầng {tier} thành công',
-logTierFailFmt: '?Tầng {tier} lỗi: {msg}',
+logTierOkFmt: '✓ Tầng {tier} thành công',
+logTierFailFmt: '✗ Tầng {tier} lỗi: {msg}',
 logDoneFmt: 'Xong OK:{ok} lỗi:{fail}',
 logPhaseLineFmt: 'Giai đoạn:{phase} cấp dưới:{count}',
 userRejectConnect: 'Đã hủy kết nối',
 walletDenied: 'Chưa ủy quyền ví',
-invalidAddress: 'Nhập địa ch?ví hợp l?,
+invalidAddress: 'Nhập địa chỉ ví hợp lệ',
 userPhaseFmt: 'Giai đoạn {phase}',
-burnProgressThisPhase: 'Tiến đ?đốt (giai đoạn này)',
-burnProgressTotal: 'Tiến đ?đốt (c?chu k?',
+burnProgressThisPhase: 'Tiến độ đốt (giai đoạn này)',
+burnProgressTotal: 'Tiến độ đốt (cả chu kỳ)',
 burnProgressFmt: '{cur} / {target} · {pct}%',
-err24hHold: 'Chưa đ?điều kiện gi?24h',
-errTierTimer: 'B?đếm gi?tầng chưa bắt đầu',
+err24hHold: 'Chưa đủ điều kiện giữ 24h',
+errTierTimer: 'Bộ đếm giữ tầng chưa bắt đầu',
 errTierClaimed: 'Đã nhận thưởng tầng này',
-errDownHold: 'Cấp dưới gi?không đ?,
-errUpHold: 'Cấp trên gi?không đ?,
-errHoldQualified: 'Gi?không đạt',
+errDownHold: 'Cấp dưới giữ không đủ',
+errUpHold: 'Cấp trên giữ không đủ',
+errHoldQualified: 'Giữ không đạt',
 errAlreadyBound: 'Đã liên kết người giới thiệu',
-errInvalidReferrer: 'Người giới thiệu không hợp l?,
-errSelfRef: 'Không th?t?giới thiệu chính mình',
-errNoBuy: 'Cấp dưới chưa mua DEX đ?điều kiện',
+errInvalidReferrer: 'Người giới thiệu không hợp lệ',
+errSelfRef: 'Không thể tự giới thiệu chính mình',
+errNoBuy: 'Cấp dưới chưa mua DEX đủ điều kiện',
 errTooSoon: 'Thao tác quá sớm',
-errInvalidTier: 'Tầng không hợp l?,
+errInvalidTier: 'Tầng không hợp lệ',
 errNotReferrer: 'Không phải người giới thiệu của cấp dưới',
-errOldUserClear: 'Người cũ cần x?v?th?trước',
+errOldUserClear: 'Người cũ cần xả vị thế trước',
 errAlreadyClaimed: 'Đã nhận',
-errNotQualified: 'Không đ?điều kiện',
-errInsufficientBalance: 'S?dư không đ?,
+errNotQualified: 'Không đủ điều kiện',
+errInsufficientBalance: 'Số dư không đủ',
 errTransferFailed: 'Chuyển thất bại',
 errUnauthorized: 'Chưa được phép',
 errAlreadySigned: 'Đã ký',
-errNotEnoughSigs: 'Chưa đ?ch?ký',
-errInvalidAddress: 'Địa ch?không hợp l?,
-errUserRejected: 'Người dùng t?chối ký',
+errNotEnoughSigs: 'Chưa đủ chữ ký',
+errInvalidAddress: 'Địa chỉ không hợp lệ',
+errUserRejected: 'Người dùng từ chối ký',
 errRevertFmt: 'Hoàn tác: {reason}',
 errUnknownFmt: '{detail}',
 logErrorFmt: 'Lỗi: {msg}',
 wrongNetworkStrict: 'Sai mạng: hãy chuyển sang BSC trong ví rồi kết nối lại.',
-contractNotConfigured: 'Chưa cấu hình địa ch?hợp đồng chính; không th?đọc d?liệu on-chain (đặt CONFIG.MAIN_CONTRACT sau khi triển khai).',
-zeroAddressNotAllowed: 'Không được dùng địa ch?zero.',
-cannotBindSelf: 'Bạn không th?t?gán mình làm người giới thiệu.',
-txPending: 'Giao dịch đã gửi, đang ch?xác nhận?,
-duplicateActionWait: 'Vui lòng ch?giao dịch trước hoàn tất.',
-errUplineNoDex: 'Địa ch?này chưa có lượt mua DEX hợp l? không th?làm người giới thiệu.',
-errUplineCooldownFmt: 'Người giới thiệu đang trong thời gian ch?(cooldown). Th?lại sau khi s?khối vượt {block}.',
-chainReadFailed: 'Đọc d?liệu on-chain thất bại. Kiểm tra mạng, địa ch?hợp đồng hoặc CSP trình duyệt.'
+contractNotConfigured: 'Chưa cấu hình địa chỉ hợp đồng chính; không thể đọc dữ liệu on-chain (đặt CONFIG.MAIN_CONTRACT sau khi triển khai).',
+zeroAddressNotAllowed: 'Không được dùng địa chỉ zero.',
+cannotBindSelf: 'Bạn không thể tự gán mình làm người giới thiệu.',
+txPending: 'Giao dịch đã gửi, đang chờ xác nhận…',
+duplicateActionWait: 'Vui lòng chờ giao dịch trước hoàn tất.',
+errUplineNoDex: 'Địa chỉ này chưa có lượt mua DEX hợp lệ, không thể làm người giới thiệu.',
+errUplineCooldownFmt: 'Người giới thiệu đang trong thời gian chờ (cooldown). Thử lại sau khi số khối vượt {block}.',
+chainReadFailed: 'Đọc dữ liệu on-chain thất bại. Kiểm tra mạng, địa chỉ hợp đồng hoặc CSP trình duyệt.'
 },
 th: {
 pageTitle: 'XYL Token',
 selectLanguage: 'ภาษา',
-menuTitle: 'เมน?,
+menuTitle: 'เมนู',
 languageSection: 'ภาษา',
-menuLangHint: 'เลือกแล้วหน้าจอเปลี่ยนทันท?หา?TokenPocket ไม่เปลี่ยน ลองรีเฟร?,
-connectWallet: 'เชื่อมต่อกระเป๋?,
+menuLangHint: 'เลือกแล้วหน้าจอเปลี่ยนทันที หาก TokenPocket ไม่เปลี่ยน ลองรีเฟรช',
+connectWallet: 'เชื่อมต่อกระเป๋า',
 disconnectWallet: 'ตัดการเชื่อมต่อ',
-tabHome: 'หน้าแร?,
+tabHome: 'หน้าแรก',
 tabLock: 'ล็อก',
-tabReferral: 'แนะน?,
+tabReferral: 'แนะนำ',
 tabInfo: 'ของฉัน',
 phaseProgress: 'ความคืบหน้าของระยะ',
 phase1: 'ระยะ 1',
@@ -2034,18 +2029,18 @@ reward1Percent: '1% รางวัล',
 reward3Percent: '3% รางวัล',
 reward5Percent: '5% รางวัล',
 currentPhaseRewardDesc: 'รายละเอียดรางวัลระยะปัจจุบัน',
-tier: 'ระดั?,
-superiorThreshold: 'เกณฑ์ระดับบ?,
-subordinateThreshold: 'เกณฑ์ระดับล่า?,
-tierOne: 'ระดั?1',
-tierTwo: 'ระดั?2',
-tierThree: 'ระดั?3',
+tier: 'ระดับ',
+superiorThreshold: 'เกณฑ์ระดับบน',
+subordinateThreshold: 'เกณฑ์ระดับล่าง',
+tierOne: 'ระดับ 1',
+tierTwo: 'ระดับ 2',
+tierThree: 'ระดับ 3',
 threshold300M: '3M',
 threshold150M: '1.5M',
 threshold80M: '800K',
 threshold50M: '500K',
 threshold10M: '100K',
-contractData: 'ข้อมูลสัญญ?,
+contractData: 'ข้อมูลสัญญา',
 burnedAmount: 'จำนวนเผา',
 circulatingSupply: 'อุปทานหมุนเวียน',
 lockData: 'ล็อก',
@@ -2059,99 +2054,149 @@ referralRewardClaim: 'รับรางวัลแนะนำ',
 refreshAll: 'รีเฟรชทั้งหมด',
 claimAll: 'รับทั้งหมด',
 noDownline: 'ไม่มีระดับล่าง',
-notQualified: 'ไม่ผ่า?,
+notQualified: 'ไม่ผ่าน',
 claimable: 'รับได้',
-claimedAll: 'รับแล้?,
-myWallet: 'กระเป๋าของฉั?,
-tokenBalance: 'ยอ?Token',
-totalDexBuy: 'ซื้อ DEX รว?,
+claimedAll: 'รับแล้ว',
+myWallet: 'กระเป๋าของฉัน',
+tokenBalance: 'ยอด Token',
+totalDexBuy: 'ซื้อ DEX รวม',
 holdStatus: 'สถานะถือ',
-currentHoldThreshold: 'เกณฑ์ถือปัจจุบั?,
-holdStartTime: 'เวลาเริ่มถื?,
+currentHoldThreshold: 'เกณฑ์ถือปัจจุบัน',
+holdStartTime: 'เวลาเริ่มถือ',
 unlockTime24h: 'เวลาปลดล็อก 24 ชม.',
-userPhase: 'ระดับผู้ใช?,
-refreshInfo: 'ข้อมูลรีเฟร?,
-lastRefresh: 'รีเฟรชล่าสุ?,
-nextRefresh: 'รีเฟรชครั้งต่อไ?,
+userPhase: 'ระดับผู้ใช้',
+refreshInfo: 'ข้อมูลรีเฟรช',
+lastRefresh: 'รีเฟรชล่าสุด',
+nextRefresh: 'รีเฟรชครั้งต่อไป',
 confirm: 'ยืนยัน',
-installWallet: 'กรุณาติดตั้ง MetaMask, TokenPocket หรือกระเป๋?Web3 อื่น',
-switchToBSC: 'กรุณาสลับเป็?BSC Mainnet ด้วยตัวเอง',
-autoBindReferrer: 'กำลังเชื่อมโยงผู้แนะนำอัตโนมัต?..',
-bindSuccess: 'เชื่อมโยงผู้แนะนำสำเร็?',
-connectFirst: 'กรุณาเชื่อมต่อกระเป๋าก่อ?,
-copySuccess: 'คัดลอกสำเร็?',
-bindSuccessToast: 'เชื่อมโยงสำเร็?',
-waitToRefresh: 'กรุณาร?{minutes} นาทีก่อนรีเฟร?,
-waitToClaim: 'กรุณาร?{minutes} นาทีก่อนรั?,
+installWallet: 'กรุณาติดตั้ง MetaMask, TokenPocket หรือกระเป๋า Web3 อื่น',
+switchToBSC: 'กรุณาสลับเป็น BSC Mainnet ด้วยตัวเอง',
+autoBindReferrer: 'กำลังเชื่อมโยงผู้แนะนำอัตโนมัติ...',
+bindSuccess: 'เชื่อมโยงผู้แนะนำสำเร็จ!',
+connectFirst: 'กรุณาเชื่อมต่อกระเป๋าก่อน',
+copySuccess: 'คัดลอกสำเร็จ!',
+bindSuccessToast: 'เชื่อมโยงสำเร็จ!',
+waitToRefresh: 'กรุณารอ {minutes} นาทีก่อนรีเฟรช',
+waitToClaim: 'กรุณารอ {minutes} นาทีก่อนรับ',
 noDownlineToClaim: 'ไม่มีระดับล่างที่จะรับ',
 startClaiming: 'เริ่มรับทั้งหมดในคลิกเดียว...',
-userCancelled: 'ผู้ใช้ยกเลิกการลงนา?หยุดรั?,
+userCancelled: 'ผู้ใช้ยกเลิกการลงนาม หยุดรับ',
 noClaimableReward: 'ไม่มีรางวัลที่รับได้ในขณะนี้',
-downline: 'ระดับล่า?,
-tierClaim: 'ระดั?,
-claimSuccess: 'รับสำเร็?,
-claimFailed: 'ล้มเหล?,
+downline: 'ระดับล่าง',
+tierClaim: 'ระดับ',
+claimSuccess: 'รับสำเร็จ',
+claimFailed: 'ล้มเหลว',
 operationError: 'ข้อผิดพลาดการทำงาน',
 chainOnPhase: 'เฟสบน-chain',
-phaseEndedBadge: '(ถึงเป้าเผา รอเฟสถัดไ?',
+phaseEndedBadge: '(ถึงเป้าเผา รอเฟสถัดไป)',
 referrerStatusLabel: 'ผู้แนะนำ',
-holdQualifiedLabel: 'ถือครบเงื่อนไ?,
-referrerBound: 'ผูกแล้?,
-referrerNotBound: 'ยังไม่ผู?,
-holdYes: '?ผ่าน',
-holdNo: '?ไม่ผ่า?,
+holdQualifiedLabel: 'ถือครบเงื่อนไข',
+referrerBound: 'ผูกแล้ว',
+referrerNotBound: 'ยังไม่ผูก',
+holdYes: '✅ ผ่าน',
+holdNo: '❌ ไม่ผ่าน',
 userPhaseNewLabel: 'ผู้ใช้ใหม่',
 claimLogTitle: 'บันทึก',
-refreshModalTitle: 'รีเฟร?,
-logTryClaimFmt: 'รั?{addr} ชั้น {tier}',
-logTierOkFmt: '?ชั้น {tier} สำเร็?,
-logTierFailFmt: '?ชั้น {tier} ล้มเหล? {msg}',
-logDoneFmt: 'เสร็จ สำเร็?{ok} ล้มเหล?{fail}',
-logPhaseLineFmt: 'เฟส:{phase} ดาวน์ไลน?{count}',
+refreshModalTitle: 'รีเฟรช',
+logTryClaimFmt: 'รับ {addr} ชั้น {tier}',
+logTierOkFmt: '✓ ชั้น {tier} สำเร็จ',
+logTierFailFmt: '✗ ชั้น {tier} ล้มเหลว: {msg}',
+logDoneFmt: 'เสร็จ สำเร็จ:{ok} ล้มเหลว:{fail}',
+logPhaseLineFmt: 'เฟส:{phase} ดาวน์ไลน์:{count}',
 userRejectConnect: 'ยกเลิกการเชื่อมต่อ',
-walletDenied: 'ยังไม่อนุญาตกระเป๋?,
-invalidAddress: 'ใส่ที่อยู่กระเป๋าที่ถูกต้อ?,
+walletDenied: 'ยังไม่อนุญาตกระเป๋า',
+invalidAddress: 'ใส่ที่อยู่กระเป๋าที่ถูกต้อง',
 userPhaseFmt: 'เฟส {phase}',
-burnProgressThisPhase: 'ความคืบหน้าเผา (เฟสนี?',
-burnProgressTotal: 'ความคืบหน้าเผา (ทั้งรอ?',
+burnProgressThisPhase: 'ความคืบหน้าเผา (เฟสนี้)',
+burnProgressTotal: 'ความคืบหน้าเผา (ทั้งรอบ)',
 burnProgressFmt: '{cur} / {target} · {pct}%',
 err24hHold: 'ยังไม่ครบเงื่อนไขถือ 24 ชม.',
 errTierTimer: 'ตัวจับเวลาถือระดับยังไม่เริ่ม',
-errTierClaimed: 'รับรางวัลระดับนี้แล้?,
-errDownHold: 'ดาวน์ไลน์ถือไม่พ?,
-errUpHold: 'อัปไลน์ถือไม่พ?,
+errTierClaimed: 'รับรางวัลระดับนี้แล้ว',
+errDownHold: 'ดาวน์ไลน์ถือไม่พอ',
+errUpHold: 'อัปไลน์ถือไม่พอ',
 errHoldQualified: 'การถือไม่ผ่านเกณฑ์',
-errAlreadyBound: 'ผูกผู้แนะนำแล้?,
+errAlreadyBound: 'ผูกผู้แนะนำแล้ว',
 errInvalidReferrer: 'ผู้แนะนำไม่ถูกต้อง',
-errSelfRef: 'ไม่สามารถผูกตัวเองเป็นผู้แนะน?,
-errNoBuy: 'ดาวน์ไลน์ยังไม่ซื้?DEX ตามเงื่อนไ?,
-errTooSoon: 'ทำรีบเกินไ?,
-errInvalidTier: 'ระดับไม่ถูกต้อ?,
+errSelfRef: 'ไม่สามารถผูกตัวเองเป็นผู้แนะนำ',
+errNoBuy: 'ดาวน์ไลน์ยังไม่ซื้อ DEX ตามเงื่อนไข',
+errTooSoon: 'ทำรีบเกินไป',
+errInvalidTier: 'ระดับไม่ถูกต้อง',
 errNotReferrer: 'ไม่ใช่ผู้แนะนำของดาวน์ไลน์',
 errOldUserClear: 'ผู้ใช้เก่าต้องเคลียร์ก่อน',
-errAlreadyClaimed: 'รับแล้?,
-errNotQualified: 'ไม่ผ่านเงื่อนไ?,
+errAlreadyClaimed: 'รับแล้ว',
+errNotQualified: 'ไม่ผ่านเงื่อนไข',
 errInsufficientBalance: 'ยอดไม่พอ',
-errTransferFailed: 'โอนล้มเหล?,
-errUnauthorized: 'ไม่ได้รับอนุญา?,
-errAlreadySigned: 'ลงนามแล้?,
+errTransferFailed: 'โอนล้มเหลว',
+errUnauthorized: 'ไม่ได้รับอนุญาต',
+errAlreadySigned: 'ลงนามแล้ว',
 errNotEnoughSigs: 'ลายเซ็นไม่พอ',
-errInvalidAddress: 'ที่อยู่ไม่ถูกต้อ?,
-errUserRejected: 'ผู้ใช้ปฏิเสธลงนา?,
+errInvalidAddress: 'ที่อยู่ไม่ถูกต้อง',
+errUserRejected: 'ผู้ใช้ปฏิเสธลงนาม',
 errRevertFmt: 'ย้อนกลับ: {reason}',
 errUnknownFmt: '{detail}',
 logErrorFmt: 'ข้อผิดพลาด: {msg}',
-wrongNetworkStrict: 'เครือข่ายไม่ถูกต้อง: สลับเป็?BSC ในกระเป๋าแล้วเชื่อมต่อใหม่',
-contractNotConfigured: 'ยังไม่ได้ตั้งที่อยู่สัญญาหลั?จึงอ่านข้อมูลบนเชนไม่ได้ (ตั้ง CONFIG.MAIN_CONTRACT หลัง deploy)',
-zeroAddressNotAllowed: 'ไม่อนุญาตให้ใช้ที่อยู่ศูนย?,
+wrongNetworkStrict: 'เครือข่ายไม่ถูกต้อง: สลับเป็น BSC ในกระเป๋าแล้วเชื่อมต่อใหม่',
+contractNotConfigured: 'ยังไม่ได้ตั้งที่อยู่สัญญาหลัก จึงอ่านข้อมูลบนเชนไม่ได้ (ตั้ง CONFIG.MAIN_CONTRACT หลัง deploy)',
+zeroAddressNotAllowed: 'ไม่อนุญาตให้ใช้ที่อยู่ศูนย์',
 cannotBindSelf: 'ไม่สามารถผูกตัวเองเป็นผู้แนะนำได้',
-txPending: 'ส่งธุรกรรมแล้ว กำลังรอการยืนยัน?,
+txPending: 'ส่งธุรกรรมแล้ว กำลังรอการยืนยัน…',
 duplicateActionWait: 'โปรดรอให้ธุรกรรมก่อนหน้าเสร็จสิ้น',
-errUplineNoDex: 'ที่อยู่นี้ยังไม่มีประวัติซื้?DEX ตามเงื่อนไ?จึงเป็นผู้แนะนำไม่ได?,
+errUplineNoDex: 'ที่อยู่นี้ยังไม่มีประวัติซื้อ DEX ตามเงื่อนไข จึงเป็นผู้แนะนำไม่ได้',
 errUplineCooldownFmt: 'ผู้แนะนำอยู่ในช่วงคูลดาวน์ ลองใหม่เมื่อเลขบล็อกสูงกว่า {block}',
-chainReadFailed: 'อ่านข้อมูลบนเชนล้มเหล?ตรวจสอบเครือข่าย ที่อยู่สัญญา หรือ CSP'
+chainReadFailed: 'อ่านข้อมูลบนเชนล้มเหลว ตรวจสอบเครือข่าย ที่อยู่สัญญา หรือ CSP'
 }
 };
+
+/** 简体中文（基于 zh-TW，覆盖常用界面文案） */
+I18N['zh-CN'] = Object.assign({}, I18N['zh-TW'], {
+pageTitle: '小翼龙 Token',
+tokenName: '小翼龙',
+tokenSlogan: '生态社区共治',
+notConnected: '未连接',
+selectLanguage: '选择语言',
+menuTitle: '菜单',
+languageSection: '语言',
+menuLangHint: '选择语言后界面将立即切换。若 TokenPocket 内无反应，请尝试刷新页面。',
+connectWallet: '连接钱包',
+disconnectWallet: '断开连接',
+tabHome: '首页',
+tabLock: '锁仓',
+tabReferral: '推广',
+tabInfo: '我的',
+phaseProgress: '阶段进度',
+contractData: '合约数据',
+burnedAmount: '销毁总量',
+circulatingSupply: '流通供应',
+referralLink: '推广链接',
+copyLink: '复制',
+bindReferrer: '绑定',
+refreshAll: '一键刷新',
+claimAll: '一键领取',
+myWallet: '我的钱包',
+confirm: '确定',
+installWallet: '请安装 MetaMask、TokenPocket 或其他 Web3 钱包',
+connectFirst: '请先连接钱包',
+copySuccess: '复制成功',
+operationError: '操作错误',
+wrongNetworkStrict: '网络不正确：请在钱包中切换到 BSC 主网后再连接',
+contractNotConfigured: '主合约地址尚未配置，无法读取链上数据（部署后请填 CONFIG.MAIN_CONTRACT）'
+});
+
+const LANG_ALIASES = { zh: 'zh-CN', 'zh-hans': 'zh-CN', 'zh-hant': 'zh-TW', 'zh-hk': 'zh-TW' };
+
+function normalizeLang(code) {
+if (!code) return null;
+const c = String(code).trim();
+if (I18N[c]) return c;
+const lower = c.toLowerCase();
+if (I18N[lower]) return lower;
+if (LANG_ALIASES[lower]) return LANG_ALIASES[lower];
+const base = lower.split('-')[0];
+if (I18N[base]) return base;
+if (LANG_ALIASES[base]) return LANG_ALIASES[base];
+return null;
+}
 
 const LANG_STORAGE_KEY = 'xyl_lang';
 function safeStorageGet(key) {
@@ -2164,10 +2209,21 @@ try { localStorage.setItem(key, val); return; } catch (e) {}
 try { sessionStorage.setItem(key, val); } catch (e2) {}
 }
 
-let currentLang = safeStorageGet(LANG_STORAGE_KEY) || 'zh-TW';
+function detectDefaultLang() {
+const saved = normalizeLang(safeStorageGet(LANG_STORAGE_KEY));
+if (saved) return saved;
+try {
+const nav = (navigator.language || navigator.userLanguage || '').toLowerCase();
+if (nav.indexOf('zh-tw') >= 0 || nav.indexOf('zh-hk') >= 0 || nav.indexOf('zh-hant') >= 0) return 'zh-TW';
+if (nav.indexOf('zh') >= 0) return 'zh-CN';
+} catch (e) {}
+return 'zh-CN';
+}
+
+let currentLang = detectDefaultLang();
 
 function t(key) {
-const langData = I18N[currentLang] || I18N['zh-TW'];
+const langData = I18N[currentLang] || I18N['zh-CN'] || I18N['zh-TW'];
 return langData[key] || key;
 }
 
@@ -2266,27 +2322,485 @@ renderBurnProgressFromSnapshot();
 }
 
 var LANG_UI = {
+'zh-CN': { short: 'CN', flag: '🇨🇳', label: '简体中文' },
 'zh-TW': { short: 'TW', flag: '🇹🇼', label: '繁體中文' },
 'en': { short: 'EN', flag: '🇬🇧', label: 'English' },
-'ja': { short: 'JP', flag: '🇯🇵', label: '日本語' }, 500);
+'ja': { short: 'JP', flag: '🇯🇵', label: '日本語' },
+'ko': { short: 'KR', flag: '🇰🇷', label: '한국어' },
+'vi': { short: 'VI', flag: '🇻🇳', label: 'Tiếng Việt' },
+'th': { short: 'TH', flag: '🇹🇭', label: 'ไทย' }
+};
+
+function collapseLangPanel() {
+var list = document.getElementById('langMenuList');
+var tr = document.getElementById('langMenuTrigger');
+if (list) list.classList.remove('open');
+if (tr) tr.classList.remove('open');
 }
+
+function toggleLangPanel() {
+var list = document.getElementById('langMenuList');
+var tr = document.getElementById('langMenuTrigger');
+if (!list || !tr) return;
+list.classList.toggle('open');
+tr.classList.toggle('open');
 }
-} catch (e) {
-console.log('检查推荐人状态失?', e);
+
+function toggleAppMenu(open) {
+var el = document.getElementById('menuOverlay');
+if (!el) return;
+if (open === true) {
+el.classList.remove('hidden');
+document.body.style.overflow = 'hidden';
+return;
+}
+if (open === false) {
+el.classList.add('hidden');
+document.body.style.overflow = '';
+collapseLangPanel();
 }
 }
 
+function updateLangMenuUI() {
+var meta = LANG_UI[currentLang] || LANG_UI['zh-CN'] || LANG_UI['zh-TW'];
+var ff = document.getElementById('langTriggerFlag');
+var fs = document.getElementById('langTriggerShort');
+var fl = document.getElementById('langTriggerLabel');
+if (ff) ff.textContent = meta.flag;
+if (fs) fs.textContent = meta.short;
+if (fl) fl.textContent = meta.label;
+var rows = document.querySelectorAll('.lang-menu-row');
+for (var i = 0; i < rows.length; i++) {
+var row = rows[i];
+row.classList.toggle('active', row.getAttribute('data-lang') === currentLang);
+}
+}
+
+function findLangRow(el) {
+while (el && el !== document) {
+if (el.nodeType === 1 && el.classList && el.classList.contains('lang-menu-row')) return el;
+el = el.parentNode;
+}
+return null;
+}
+
+function setLanguage(lang) {
+const code = normalizeLang(lang);
+if (!code || !I18N[code]) {
+console.warn('[XYL] unknown language:', lang);
+return;
+}
+currentLang = code;
+safeStorageSet(LANG_STORAGE_KEY, code);
+try { document.documentElement.lang = code; } catch (e) {}
+applyTranslations();
+updateLangMenuUI();
+renderBurnProgressFromSnapshot();
+collapseLangPanel();
+toggleAppMenu(false);
+}
+
+function applyTranslations() {
+document.title = t('pageTitle');
+document.querySelectorAll('[data-i18n]').forEach(el => {
+const key = el.getAttribute('data-i18n');
+el.textContent = t(key);
+});
+document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+const key = el.getAttribute('data-i18n-placeholder');
+el.placeholder = t(key);
+});
+}
+
+let web3;
+let account;
+let mainContract;
+let readWeb3;
+let readContract;
+let lockContract;
+let isLoading = false;
+
+/** 已连接钱包时：读链一律走钱包节点（TokenPocket 内置浏览器必须如此）；未连接时才用 HTTP RPC */
+function vc() {
+if (account && mainContract) return mainContract;
+return readContract || mainContract;
+}
+
+/** TokenPocket / MetaMask 等 App 内置浏览器：必须用钱包注入节点读链，不能直连 HTTP RPC（易被 CORS/HTTPS 拦截） */
+function isInAppWalletBrowser() {
+if (typeof window === "undefined") return false;
+if (window.ethereum && (window.ethereum.isTokenPocket || window.ethereum.isMetaMask)) return true;
+if (window.tokenpocket || window.tp) return true;
+const ua = navigator.userAgent || "";
+return /TokenPocket|MetaMaskMobile|imToken|TrustWallet|OKApp/i.test(ua);
+}
+
+async function initReadProvider() {
+readWeb3 = null;
+readContract = null;
+if (web3 && mainContract) {
+readWeb3 = web3;
+readContract = mainContract;
+if (isInAppWalletBrowser()) {
+console.info("[XYL] in-app wallet: read via wallet provider only");
+return true;
+}
+try {
+await mainContract.methods.totalSupply().call();
+console.info("[XYL] read via wallet");
+return true;
+} catch (eWallet) {
+console.warn("[XYL] wallet read probe failed, will try HTTP RPC", eWallet);
+}
+}
+const primary = (CONFIG.BSC_RPC || "").trim();
+const urls = primary
+ ? [primary].concat(RPC_FALLBACKS.filter(function (u) { return u !== primary; }))
+ : RPC_FALLBACKS.slice();
+for (let i = 0; i < urls.length; i++) {
+const url = urls[i];
+try {
+const provider = new Web3.providers.HttpProvider(url, { keepAlive: false, timeout: 20000 });
+const w = new Web3(provider);
+const block = await Promise.race([
+w.eth.getBlockNumber(),
+new Promise(function (_, rej) { setTimeout(function () { rej(new Error("rpc timeout")); }, 20000); })
+]);
+readWeb3 = w;
+readContract = new w.eth.Contract(MAIN_ABI, CONFIG.MAIN_CONTRACT);
+console.info("[XYL] read RPC ok:", url, "block", block);
+return true;
+} catch (e) {
+console.warn("[XYL] RPC fail:", url, e && (e.message || e));
+}
+}
+if (web3 && mainContract) {
+readWeb3 = web3;
+readContract = mainContract;
+console.warn("[XYL] HTTP RPC failed, fallback wallet");
+return false;
+}
+return false;
+}
+
+const ZERO_ADDRESS_HEX = '0x0000000000000000000000000000000000000000';
+
+function isZeroContractAddress(addr) {
+if (!addr || typeof addr !== 'string') return true;
+return addr.toLowerCase() === ZERO_ADDRESS_HEX.toLowerCase();
+}
+
+function normalizeAddressResult(v) {
+if (v == null || v === undefined) return '';
+if (typeof v === 'string') return v.trim();
+if (Array.isArray(v) && v.length > 0) return normalizeAddressResult(v[0]);
+const s = String(v).trim();
+if (/^0x[0-9a-fA-F]{40}$/i.test(s)) return s;
+return s;
+}
+
+function isLikelyEthAddress(s) {
+const t = String(s || '').trim();
+return /^0x[0-9a-fA-F]{40}$/i.test(t);
+}
+
+function getReferralRootBase() {
+const cfg = CONFIG.REFERRAL_BASE;
+if (cfg != null && String(cfg).trim() !== '') {
+let b = String(cfg).trim();
+return b.endsWith('/') ? b : b + '/';
+}
+try {
+return new URL('.', window.location.href).href;
+} catch (e) {
+return '';
+}
+}
+
+function buildReferralLink(acc) {
+const root = getReferralRootBase();
+if (!root) return '';
+return root + 'referral/?ref=' + encodeURIComponent(acc);
+}
+
+async function refreshReferrerRow() {
+if (!mainContract || !account) return;
+const refEl = document.getElementById('referrerStatus');
+if (!refEl) return;
+if (isZeroContractAddress(CONFIG.MAIN_CONTRACT)) {
+refEl.textContent = t('contractNotConfigured');
+refEl.title = '';
+refEl.removeAttribute('aria-label');
+return;
+}
+try {
+const raw = await vc().methods.referrer(account).call();
+const addr = normalizeAddressResult(raw);
+const refOk = addr && isLikelyEthAddress(addr) && !isZeroContractAddress(addr);
+if (refOk) {
+let disp = addr;
+try {
+if (web3 && web3.utils) disp = web3.utils.toChecksumAddress(addr);
+} catch (e1) {}
+refEl.textContent = disp.slice(0, 6) + '...' + disp.slice(-4);
+refEl.title = disp;
+refEl.setAttribute('aria-label', t('referrerStatusLabel') + ': ' + disp);
+} else {
+refEl.textContent = t('referrerNotBound');
+refEl.title = '';
+refEl.removeAttribute('aria-label');
+}
+} catch (e) {
+console.warn('refreshReferrerRow', e);
+refEl.textContent = t('chainReadFailed');
+refEl.title = '';
+refEl.removeAttribute('aria-label');
+}
+}
+
+async function ensureWalletOnConfiguredChain(ethereum) {
+const tmp = new Web3(ethereum);
+let chainId = Number(await tmp.eth.getChainId());
+if (chainId === CONFIG.CHAIN_ID) return true;
+try {
+await ethereum.request({
+method: 'wallet_switchEthereumChain',
+params: [{ chainId: '0x' + CONFIG.CHAIN_ID.toString(16) }]
+});
+} catch (e) {
+const code = e && e.code;
+if (code === 4902) showToast(t('switchToBSC'), 'error');
+else showToast(t('wrongNetworkStrict'), 'error');
+return false;
+}
+chainId = Number(await tmp.eth.getChainId());
+if (chainId !== CONFIG.CHAIN_ID) {
+showToast(t('wrongNetworkStrict'), 'error');
+return false;
+}
+return true;
+}
+
+function sanitizeUserFacingText(text) {
+if (text == null) return '';
+const s0 = String(text);
+let s = s0.replace(/0x[a-fA-F0-9]{64,}/gi, '0x***');
+s = s.replace(/0x[a-fA-F0-9]{40}/gi, '0x***');
+if (s.length > 220) s = s.slice(0, 220) + '…';
+return s;
+}
+
+let txPipelineBusy = false;
+
+async function sendTxAndWait(sendPromise, options) {
+options = options || {};
+if (!options.skipPendingToast) showToast(t('txPending'), 'info');
+return await sendPromise;
+}
+
+const MAIN_ABI = [
+{"inputs":[],"name":"name","outputs":[{"type":"string"}],"stateMutability":"view","type":"function"},
+{"inputs":[],"name":"symbol","outputs":[{"type":"string"}],"stateMutability":"view","type":"function"},
+{"inputs":[],"name":"totalSupply","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+{"inputs":[],"name":"getBurnedAmount","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+{"inputs":[{"name":"user","type":"address"}],"name":"balanceOf","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+{"inputs":[{"name":"user","type":"address"}],"name":"referrer","outputs":[{"type":"address"}],"stateMutability":"view","type":"function"},
+{"inputs":[{"name":"","type":"address"}],"name":"referralBindCooldown","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+{"inputs":[{"name":"user","type":"address"}],"name":"getUserPhase","outputs":[{"type":"uint8"}],"stateMutability":"view","type":"function"},
+{"inputs":[{"name":"","type":"address"},{"name":"","type":"uint8"}],"name":"tierHoldTimer","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+{"inputs":[{"name":"user","type":"address"}],"name":"dexBuyAmount","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+{"inputs":[{"name":"refAddr","type":"address"}],"name":"bindReferrer","outputs":[],"stateMutability":"nonpayable","type":"function"},
+{"inputs":[],"name":"lockContract","outputs":[{"type":"address"}],"stateMutability":"view","type":"function"},
+{"inputs":[{"name":"user","type":"address"}],"name":"downlines","outputs":[{"type":"address[]"}],"stateMutability":"view","type":"function"},
+{"inputs":[{"name":"downline","type":"address"},{"name":"tierId","type":"uint8"}],"name":"claimReward","outputs":[],"stateMutability":"nonpayable","type":"function"},
+{"inputs":[],"name":"currentPhase","outputs":[{"type":"uint8"}],"stateMutability":"view","type":"function"},
+{"inputs":[],"name":"currentPhaseEnded","outputs":[{"type":"bool"}],"stateMutability":"view","type":"function"},
+{"inputs":[{"name":"","type":"uint256"}],"name":"phaseConfigs","outputs":[{"name":"rewardPercent","type":"uint256"},{"name":"endBurnThreshold","type":"uint256"},{"name":"maxBurnForReward","type":"uint256"},{"name":"requireOldUserClear","type":"bool"},{"name":"oldPhaseCount","type":"uint8"}],"stateMutability":"view","type":"function"},
+{"inputs":[{"name":"user","type":"address"}],"name":"getCurrentPhaseNetHold","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+{"inputs":[{"name":"phase","type":"uint8"},{"name":"tier","type":"uint8"}],"name":"phaseTiers","outputs":[{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
+{"inputs":[{"name":"up","type":"address"},{"name":"down","type":"address"},{"name":"phase","type":"uint8"}],"name":"tierClaimed","outputs":[{"type":"uint8"}],"stateMutability":"view","type":"function"}
+];
+
+const LOCK_ABI = [
+{"inputs":[],"name":"getDashboardStats","outputs":[{"name":"privateLockTotal","type":"uint256"},{"name":"privateReleased","type":"uint256"},{"name":"projectLockTotal","type":"uint256"},{"name":"projectReleased","type":"uint256"}],"stateMutability":"view","type":"function"},
+{"inputs":[],"name":"privateLock30","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
+{"inputs":[],"name":"privateLock40","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
+{"inputs":[],"name":"projectLock30","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
+{"inputs":[],"name":"projectLock40","outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"},
+{"inputs":[],"name":"autoReleaseCooldownRemaining","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+{"inputs":[],"name":"autoReleaseAll","outputs":[{"type":"uint256"}],"stateMutability":"nonpayable","type":"function"}
+];
+
+function formatToken(amount, decimals) {
+decimals = decimals == null ? CONFIG.TOKEN_DECIMALS : decimals;
+const raw = String(amount == null ? "" : amount).trim();
+if (!raw || raw === "0") return "0";
+if (web3 && web3.utils && decimals === 18) {
+try {
+const ether = web3.utils.fromWei(raw, "ether");
+const parts = ether.split(".");
+const whole = Number(parts[0]).toLocaleString();
+if (!parts[1] || /^0+$/.test(parts[1])) return whole;
+const frac = parts[1].replace(/0+$/, "").slice(0, 4);
+return frac ? whole + "." + frac : whole;
+} catch (eFrom) {}
+}
+if (typeof BigInt !== "undefined") {
+try {
+const num = BigInt(raw);
+const divisor = BigInt(10 ** decimals);
+const whole = num / divisor;
+const remainder = num % divisor;
+const fraction = remainder.toString().padStart(decimals, "0").slice(0, 4);
+if (remainder === 0n) return whole.toLocaleString();
+return (whole + "." + fraction).replace(/\.?0+$/, "");
+} catch (eBi) {}
+}
+return raw;
+}
+
+function formatDate(timestamp) {
+if (!timestamp || timestamp === '0') return '--';
+const date = new Date(Number(timestamp) * 1000);
+return date.toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'});
+}
+
+function showToast(message, type = 'info') {
+const toast = document.getElementById('toast');
+const raw = String(message);
+toast.textContent = type === 'error' ? sanitizeUserFacingText(raw) : raw;
+toast.className = `toast ${type} show`;
+setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+function showError(msg, elementId = 'referralError') {
+const box = document.getElementById(elementId);
+box.textContent = sanitizeUserFacingText(String(msg));
+box.classList.add('show');
+setTimeout(() => box.classList.remove('show'), 5000);
+}
+
+function switchTab(tabName) {
+document.querySelectorAll('.tab-btn').forEach(btn => {
+btn.classList.toggle('active', btn.getAttribute('data-tab') === tabName);
+});
+document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+const pane = document.getElementById('tab-' + tabName);
+if (pane) pane.classList.add('active');
+}
+
+function getReferrerFromURL() {
+const params = new URLSearchParams(window.location.search);
+return params.get('ref');
+}
+
+function getEthereumProvider() {
+if (window.ethereum) return window.ethereum;
+if (window.tokenpocket && window.tokenpocket.ethereum) return window.tokenpocket.ethereum;
+if (window.tp && window.tp.ethereum) return window.tp.ethereum;
+if (window.web3 && window.web3.currentProvider) return window.web3.currentProvider;
+return null;
+}
+
+async function connectWallet() {
+const ethereum = getEthereumProvider();
+if (!ethereum) {
+showToast(t('installWallet'), 'error');
+return;
+}
+
+try {
+let accounts = [];
+try {
+accounts = await ethereum.request({ method: 'eth_accounts' });
+} catch (e0) { accounts = []; }
+if (!accounts || accounts.length === 0) {
+try {
+accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+} catch (e) {
+if (ethereum.enable) accounts = await ethereum.enable();
+else throw e;
+}
+}
+if (!accounts || accounts.length === 0) throw new Error(t('walletDenied'));
+
+if (!(await ensureWalletOnConfiguredChain(ethereum))) return;
+
+account = accounts[0];
+web3 = new Web3(ethereum);
+mainContract = new web3.eth.Contract(MAIN_ABI, CONFIG.MAIN_CONTRACT);
+await initReadProvider();
+
+document.getElementById('beforeConnect').classList.add('hidden');
+document.getElementById('mainContent').classList.remove('hidden');
+updateStatus('connected', account.slice(0,6) + '...' + account.slice(-4));
+
+const referralLink = buildReferralLink(account);
+document.getElementById('referralLink').value = referralLink;
+
+const savedClaimTime = localStorage.getItem('xyl_last_claim');
+if (savedClaimTime) {
+lastClaimTime = parseInt(savedClaimTime);
+}
+
+const savedRefreshTime = localStorage.getItem('xyl_last_refresh');
+if (savedRefreshTime) {
+lastRefreshTime = parseInt(savedRefreshTime);
+}
+
+const mainConfigured = !isZeroContractAddress(CONFIG.MAIN_CONTRACT);
+if (mainConfigured) {
+await refreshReferrerRow();
+await refreshData();
+} else {
+showToast(t('contractNotConfigured'), 'error');
+}
+
+const pendingRef = getReferrerFromURL();
+if (mainConfigured && pendingRef && web3.utils.isAddress(pendingRef)) {
+try {
+const myRefRaw = await vc().methods.referrer(account).call();
+const myRefN = normalizeAddressResult(myRefRaw);
+if (!myRefN || isZeroContractAddress(myRefN)) {
+if (pendingRef.toLowerCase() !== account.toLowerCase()) {
+showToast(t('autoBindReferrer'), 'success');
+setTimeout(async () => {
+try {
+if (txPipelineBusy) return;
+txPipelineBusy = true;
+try {
+await sendTxAndWait(mainContract.methods.bindReferrer(web3.utils.toChecksumAddress(pendingRef)).send({ from: account }));
+showToast(t('bindSuccess'), 'success');
+await refreshReferrerRow();
+refreshData();
+} finally {
+txPipelineBusy = false;
+}
+} catch (e) {
+console.log('自动绑定失败:', e);
+}
+}, 500);
+}
+}
+} catch (e) {
+console.log('检查推荐人状态失败:', e);
+}
+}
+
+if (!ethereum._xylWalletListeners) {
+ethereum._xylWalletListeners = true;
 ethereum.on('accountsChanged', (accounts) => {
 if (!accounts || accounts.length === 0) disconnectWallet();
 else {
 account = accounts[0];
+updateStatus('connected', account.slice(0, 6) + '...' + account.slice(-4));
 void refreshReferrerRow().then(function () {
 return refreshData({ silentOnNoContract: true, silentOnReadFailure: true });
 });
 }
 });
-
 ethereum.on('chainChanged', () => window.location.reload());
+}
 
 } catch (error) {
 console.error('连接失败:', error);
@@ -2508,11 +3022,24 @@ const userPhase = await vc().methods.getUserPhase(account).call();
 const uph = Number(userPhase);
 setElText('userPhase', uph === 0 ? t('userPhaseNewLabel') : tf('userPhaseFmt', { phase: uph }));
 
-const holdInfo = await vc().methods.getUserHoldInfo(account).call();
-setElText('holdThreshold', formatToken(String(holdInfo[0])));
-setElText('holdStartTime', formatDate(holdInfo[1]));
-setElText('holdEndTime', formatDate(holdInfo[2]));
-const hq = holdInfo[3] === true || holdInfo[3] === 'true';
+let tierDownMin = '0';
+try {
+const tier1 = await vc().methods.phaseTiers(phaseNum, 1).call();
+tierDownMin = String(tier1.downMin != null ? tier1.downMin : tier1[1]);
+} catch (eTier) { console.warn('phaseTiers', eTier); }
+const netHold = await vc().methods.getCurrentPhaseNetHold(account).call();
+setElText('holdThreshold', formatToken(tierDownMin));
+let timer = '0';
+try { timer = String(await vc().methods.tierHoldTimer(account, 1).call()); } catch (eT) {}
+setElText('holdStartTime', formatDate(timer));
+if (timer && timer !== '0') {
+setElText('holdEndTime', formatDate(String(Number(timer) + 86400)));
+} else {
+setElText('holdEndTime', '--');
+}
+const netBn = web3.utils.toBN(netHold);
+const threshBn = web3.utils.toBN(tierDownMin || '0');
+const hq = threshBn.gtn(0) && netBn.gte(threshBn);
 setElText('holdQualified', hq ? t('holdYes') : t('holdNo'));
 
 const dexBuy = await vc().methods.dexBuyAmount(account).call();
@@ -2940,35 +3467,50 @@ const short = errMsg.length > 120 ? errMsg.substring(0, 120) + '...' : errMsg;
 return sanitizeUserFacingText(tf('errUnknownFmt', { detail: short }));
 }
 
+window.toggleAppMenu = toggleAppMenu;
+window.toggleLangPanel = toggleLangPanel;
+window.setLanguage = setLanguage;
+window.connectWallet = connectWallet;
+window.disconnectWallet = disconnectWallet;
+window.switchTab = switchTab;
+window.copyReferralLink = copyReferralLink;
+window.bindReferrer = bindReferrer;
+window.refreshData = refreshData;
+window.refreshAllDownlines = refreshAllDownlines;
+window.autoClaimAll = autoClaimAll;
+window.autoReleaseAllLock = autoReleaseAllLock;
+window.closeErrorModal = closeErrorModal;
+
 window.addEventListener('load', async () => {
 var langList = document.getElementById('langMenuList');
 if (langList) {
 langList.addEventListener('click', function (e) {
-var row = e.target && e.target.closest ? e.target.closest('.lang-menu-row') : null;
+if (e && e.preventDefault) e.preventDefault();
+var row = (e.target && e.target.closest) ? e.target.closest('.lang-menu-row') : findLangRow(e.target);
 if (!row) return;
 var code = row.getAttribute('data-lang');
 if (code) setLanguage(code);
 });
 }
 var params = new URLSearchParams(window.location.search);
-var urlLang = params.get('lang');
-if (urlLang && I18N[urlLang]) {
+var urlLang = normalizeLang(params.get('lang'));
+if (urlLang) {
 currentLang = urlLang;
 safeStorageSet(LANG_STORAGE_KEY, urlLang);
-}
-const savedLang = safeStorageGet(LANG_STORAGE_KEY);
-if (savedLang && I18N[savedLang]) {
-currentLang = savedLang;
 }
 applyTranslations();
 updateLangMenuUI();
 
+try {
 const ethAuto = getEthereumProvider();
 if (ethAuto) {
 const accounts = await ethAuto.request({ method: 'eth_accounts' });
-if (accounts.length > 0) {
+if (accounts && accounts.length > 0) {
 await connectWallet();
 }
+}
+} catch (e) {
+console.warn('[XYL] auto connect skipped', e);
 }
 });
 </script>
