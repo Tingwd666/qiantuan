@@ -1143,11 +1143,6 @@ flex-wrap: wrap;
 </div>
 </div>
 
-<div class="card" style="margin-top: 12px;">
-<div class="card-title" data-i18n="lockAutoRelease">一键释放（到期部分）</div>
-<p id="lockAutoReleaseHint" style="font-size: 13px; color: rgba(255,255,255,0.55); margin: 0 0 12px; line-height: 1.5;" data-i18n="lockAutoReleaseHint">将已到期的私募+项目方代币释放到固定收款地址；全网约 12 小时仅可触发一次（防刷 gas）。</p>
-<button type="button" class="btn btn-primary" id="btnAutoReleaseLock" onclick="autoReleaseAllLock()" data-i18n="lockAutoReleaseBtn">触发 autoReleaseAll</button>
-<p id="lockCooldownText" style="font-size: 12px; color: rgba(255,255,255,0.45); margin: 10px 0 0;"></p>
 </div>
 </div>
 
@@ -3083,7 +3078,6 @@ document.getElementById('privateLockTotal').textContent = formatToken(String(sta
 document.getElementById('privateReleased').textContent = formatToken(String(stats.privateReleased ?? stats[1]));
 document.getElementById('projectLockTotal').textContent = formatToken(String(stats.projectLockTotal ?? stats[2]));
 document.getElementById('projectReleased').textContent = formatToken(String(stats.projectReleased ?? stats[3]));
-await updateLockAutoReleaseUi();
 }
 } catch (error) {
 console.error('获取锁仓数据失败:', error);
@@ -3478,7 +3472,6 @@ window.bindReferrer = bindReferrer;
 window.refreshData = refreshData;
 window.refreshAllDownlines = refreshAllDownlines;
 window.autoClaimAll = autoClaimAll;
-window.autoReleaseAllLock = autoReleaseAllLock;
 window.closeErrorModal = closeErrorModal;
 
 window.addEventListener('load', async () => {
