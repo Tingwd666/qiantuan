@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小翼龙 - 推广入口</title>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var ref = params.get('ref');
+      var target = new URL('../index.html', window.location.href);
+      if (ref) target.searchParams.set('ref', ref);
+      window.location.replace(target.href);
+    })();
+  </script>
+</head>
+<body>
+  <p>正在跳转到主页面…</p>
+</body>
+</html>
