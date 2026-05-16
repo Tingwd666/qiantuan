@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; connect-src 'self' http://127.0.0.1:* http://localhost:* ws://127.0.0.1:* ws://localhost:* https://cdn.jsdelivr.net https://bsc-dataseed.binance.org https://bsc-dataseed1.binance.org https://bsc-dataseed2.binance.org https://bsc-dataseed3.binance.org https://bsc-dataseed4.binance.org https://*.binance.org https://rpc.ankr.com https://*.infura.io https://*.nodereal.io https://bsc.publicnode.com https://1rpc.io wss://*.binance.org wss://bsc-ws-node.nariox.org wss://*.binance.dev">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; connect-src 'self' http://127.0.0.1:* http://localhost:* ws://127.0.0.1:* ws://localhost:* https://cdn.jsdelivr.net https://bsc-dataseed.binance.org https://bsc-dataseed1.binance.org https://bsc-dataseed2.binance.org https://bsc-dataseed3.binance.org https://bsc-dataseed4.binance.org https://*.binance.org https://data-seed-prebsc-1-s1.binance.org:8545 https://data-seed-prebsc-2-s1.binance.org:8545 https://bsc-testnet.bnbchain.org https://bsc-testnet.publicnode.com https://*.bnbchain.org https://*.publicnode.com https://rpc.ankr.com https://*.infura.io https://*.nodereal.io https://bsc.publicnode.com https://1rpc.io wss://*.binance.org wss://bsc-ws-node.nariox.org wss://*.binance.dev">
 <title>Tiny Winged Dragon Token</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'></text></svg>">
 <style>
@@ -2313,7 +2313,9 @@ let readContract;
 let lockContract;
 let isLoading = false;
 
+/** 已连接钱包时：读链一律走钱包节点（TokenPocket 内置浏览器必须如此）；未连接时才用 HTTP RPC */
 function vc() {
+if (account && mainContract) return mainContract;
 return readContract || mainContract;
 }
 
@@ -2332,19 +2334,17 @@ readContract = null;
 if (web3 && mainContract) {
 readWeb3 = web3;
 readContract = mainContract;
+if (isInAppWalletBrowser()) {
+console.info("[XYL] in-app wallet: read via wallet provider only");
+return true;
+}
 try {
 await mainContract.methods.totalSupply().call();
-console.info("[XYL] read via wallet (in-app or desktop)");
+console.info("[XYL] read via wallet");
 return true;
 } catch (eWallet) {
-console.warn("[XYL] wallet read probe failed", eWallet);
-readWeb3 = null;
-readContract = null;
+console.warn("[XYL] wallet read probe failed, will try HTTP RPC", eWallet);
 }
-}
-if (isInAppWalletBrowser()) {
-console.warn("[XYL] in-app wallet: skip HTTP RPC, ensure chain 97 and contract address");
-return !!(readContract && readWeb3);
 }
 const primary = (CONFIG.BSC_RPC || "").trim();
 const urls = primary
