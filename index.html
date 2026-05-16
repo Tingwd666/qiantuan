@@ -1255,13 +1255,15 @@ flex-wrap: wrap;
 /**
  * MAIN_CONTRACT：主代币（代理）部署上线后改为实际地址（必填）。
  * LOCK_CONTRACT：锁仓数据默认从链上 mainContract.lockContract() 读取；仅当链上尚未写入锁仓地址、需要临时调试时，可填此处作为回退（一般保持 0 即可）。
+ * REFERRAL_BASE：推广落地页所在站点根 URL，须以 / 结尾。不填则自动用「当前 index.html 所在目录」（GitHub Pages 上传后一般为你的仓库主页路径，无需写死旧域名）。
  */
 const CONFIG = {
 BSC_RPC: "https://bsc-testnet.publicnode.com",
 CHAIN_ID: 97,
 MAIN_CONTRACT: "0x2B69565BaC23C5608a81595104Cd5F0eBA99f561",
 LOCK_CONTRACT: "0x0000000000000000000000000000000000000000",
-TOKEN_DECIMALS: 18
+TOKEN_DECIMALS: 18,
+REFERRAL_BASE: ""
 };
 
 const I18N = {
@@ -2322,6 +2324,25 @@ const t = String(s || '').trim();
 return /^0x[0-9a-fA-F]{40}$/i.test(t);
 }
 
+function getReferralRootBase() {
+const cfg = CONFIG.REFERRAL_BASE;
+if (cfg != null && String(cfg).trim() !== '') {
+let b = String(cfg).trim();
+return b.endsWith('/') ? b : b + '/';
+}
+try {
+return new URL('.', window.location.href).href;
+} catch (e) {
+return '';
+}
+}
+
+function buildReferralLink(acc) {
+const root = getReferralRootBase();
+if (!root) return '';
+return root + 'referral/?ref=' + encodeURIComponent(acc);
+}
+
 async function refreshReferrerRow() {
 if (!mainContract || !account) return;
 const refEl = document.getElementById('referrerStatus');
@@ -2509,7 +2530,7 @@ document.getElementById('beforeConnect').classList.add('hidden');
 document.getElementById('mainContent').classList.remove('hidden');
 updateStatus('connected', account.slice(0,6) + '...' + account.slice(-4));
 
-const referralLink = `https://xiao185077324long.github.io/referral/?ref=${account}`;
+const referralLink = buildReferralLink(account);
 document.getElementById('referralLink').value = referralLink;
 
 const savedClaimTime = localStorage.getItem('xyl_last_claim');
