@@ -890,6 +890,13 @@ text-align: center;
 font-weight: 600;
 }
 
+.referral-hint {
+margin: 0 0 12px;
+font-size: 12px;
+line-height: 1.5;
+color: rgba(255,255,255,0.55);
+}
+
 .downline-card {
 background: rgba(255,255,255,0.05);
 border-radius: 10px;
@@ -1201,7 +1208,7 @@ flex-wrap: wrap;
 
 <div class="card">
 <div class="card-title" data-i18n="referralRewardClaim">推广奖励领取</div>
-<div id="downlineList"></div>
+<p class="referral-hint" data-i18n="referralRewardHint">先「一键刷新」更新可领数据（24小时一次），再「一键领取」批量领取（24小时一次）。</p>
 
 <div style="margin-top: 16px;">
 <div class="btn-group">
@@ -1315,7 +1322,9 @@ REFERRAL_BASE: "",
 /** 仅文档/运营对照（链上为准）：BSC Chainlink BNB/USD */
 CHAINLINK_BNB_USD: "0x0567f2323251F2afE41C8304938f92176aF99CAc",
 /** 有官?XYL/USD 喂价后填入，并调?setPriceFeeds(bnb, 此地址) */
-CHAINLINK_TOKEN_USD: ""
+CHAINLINK_TOKEN_USD: "",
+/** 主网部署区块（可选）：用于从 ReferralBound 事件枚举下级，减轻 RPC 扫描量 */
+MAIN_DEPLOY_BLOCK: 0
 };
 
 /** BSC 主网读链备用 RPC */
@@ -1386,6 +1395,7 @@ bindReferrerLabel: '綁定推薦人（輸入推薦人地址）',
 referralLinkPlaceholder: '推廣鏈接', 
 referrerPlaceholder: '輸入推薦人地址', 
 referralRewardClaim: '推廣獎勵領取', 
+referralRewardHint: '先「一鍵刷新」更新可領數據（24小時一次），再「一鍵領取」批量領取（24小時一次）。',
 refreshAll: '一鍵刷新', 
 claimAll: '一鍵領取', 
 noDownline: '暫無下級', 
@@ -1414,6 +1424,10 @@ bindSuccessToast: '綁定成功！',
 waitToRefresh: '請等待 {minutes} 分鐘後再刷新', 
 waitToClaim: '請等待 {minutes} 分鐘後再領取', 
 noDownlineToClaim: '沒有下級可領取', 
+refreshScanning: '正在掃描下級獎勵...',
+refreshCompleteClaimable: '刷新完成，可領取 {count} 筆獎勵',
+refreshCompleteNone: '刷新完成，當前無可領取獎勵',
+claimNeedRefreshFirst: '請先點擊「一鍵刷新」後再領取',
 startClaiming: '開始一鍵領取獎勵...', 
 userCancelled: '用戶取消簽名，領取終止', 
 noClaimableReward: '當前沒有可領取的獎勵', 
@@ -1437,7 +1451,7 @@ logTryClaimFmt: '嘗試領取 {addr} 第{tier}檔',
 logTierOkFmt: '✓ 第{tier}檔 領取成功', 
 logTierFailFmt: '✗ 第{tier}檔 失敗: {msg}', 
 logDoneFmt: '完成！成功: {ok}, 失敗: {fail}', 
-logPhaseLineFmt: '當前階段: {phase}, 下級數量: {count}', 
+logPhaseLineFmt: '當前階段: {phase}，待領取: {count} 筆', 
 userRejectConnect: '用戶取消連接', 
 walletDenied: '未授權錢包', 
 invalidAddress: '請輸入有效的錢包地址', 
@@ -1532,6 +1546,7 @@ bindReferrerLabel: 'Bind Referrer (Enter referrer address)',
 referralLinkPlaceholder: 'Referral Link',
 referrerPlaceholder: 'Enter Referrer Address',
 referralRewardClaim: 'Referral Reward Claim',
+referralRewardHint: 'Refresh once per 24h to update claimable data, then Claim All once per 24h.',
 refreshAll: 'Refresh All',
 claimAll: 'Claim All',
 noDownline: 'No Downline',
@@ -1560,6 +1575,10 @@ bindSuccessToast: 'Bind success!',
 waitToRefresh: 'Please wait {minutes} minutes before refreshing',
 waitToClaim: 'Please wait {minutes} minutes before claiming',
 noDownlineToClaim: 'No downline to claim',
+refreshScanning: 'Scanning downline rewards...',
+refreshCompleteClaimable: 'Refresh done. {count} reward(s) ready to claim.',
+refreshCompleteNone: 'Refresh done. No claimable rewards right now.',
+claimNeedRefreshFirst: 'Please tap Refresh All before claiming.',
 startClaiming: 'Starting one-click claim...',
 userCancelled: 'User cancelled signature, claim stopped',
 noClaimableReward: 'No claimable reward currently',
@@ -1583,7 +1602,7 @@ logTryClaimFmt: 'Claiming {addr} tier {tier}',
 logTierOkFmt: '✓ Tier {tier} success',
 logTierFailFmt: '✗ Tier {tier} failed: {msg}',
 logDoneFmt: 'Done. OK: {ok}, failed: {fail}',
-logPhaseLineFmt: 'Phase: {phase}, downlines: {count}',
+logPhaseLineFmt: 'Phase: {phase}, pending claims: {count}',
 userRejectConnect: 'User rejected connection',
 walletDenied: 'Wallet not authorized',
 invalidAddress: 'Enter a valid wallet address',
@@ -2202,6 +2221,11 @@ copyLink: '复制',
 bindReferrer: '绑定',
 refreshAll: '一键刷新',
 claimAll: '一键领取',
+referralRewardHint: '先「一键刷新」更新可领数据（24小时一次），再「一键领取」批量领取（24小时一次）。',
+refreshScanning: '正在扫描下级奖励...',
+refreshCompleteClaimable: '刷新完成，可领取 {count} 笔奖励',
+refreshCompleteNone: '刷新完成，当前无可领取奖励',
+claimNeedRefreshFirst: '请先点击「一键刷新」后再领取',
 myWallet: '我的钱包',
 confirm: '确定',
 installWallet: '请安装 MetaMask、TokenPocket 或其他 Web3 钱包',
@@ -2776,6 +2800,7 @@ const savedRefreshTime = localStorage.getItem('xyl_last_refresh');
 if (savedRefreshTime) {
 lastRefreshTime = parseInt(savedRefreshTime);
 }
+loadDownlineRewardCache();
 
 const mainConfigured = !isZeroContractAddress(CONFIG.MAIN_CONTRACT);
 if (mainConfigured) {
@@ -3167,103 +3192,113 @@ txPipelineBusy = false;
 }
 }
 
-function renderDownlineListEmpty() {
-const root = document.getElementById('downlineList');
-if (!root) return;
-root.replaceChildren();
-const div = document.createElement('div');
-div.style.textAlign = 'center';
-div.style.padding = '20px';
-div.style.color = 'rgba(255,255,255,0.5)';
-div.textContent = t('noDownline');
-root.appendChild(div);
-}
-
-function renderDownlineListRows(rows) {
-const root = document.getElementById('downlineList');
-if (!root) return;
-root.replaceChildren();
-for (let i = 0; i < rows.length; i++) {
-const row = rows[i];
-const card = document.createElement('div');
-card.className = 'downline-card';
-const addrSpan = document.createElement('span');
-addrSpan.className = 'downline-address';
-addrSpan.textContent = row.downline.slice(0, 6) + '...' + row.downline.slice(-4);
-const badge = document.createElement('span');
-badge.className = 'downline-badge ' + row.status;
-badge.textContent = row.statusText;
-card.appendChild(addrSpan);
-card.appendChild(badge);
-root.appendChild(card);
-}
-}
-
-function setRefreshInfoLines(line1, line2) {
+function setRefreshInfoLines(line1, line2, line3) {
 const el = document.getElementById('refreshInfo');
 if (!el) return;
 el.replaceChildren();
-const s1 = document.createElement('span');
-s1.textContent = line1;
-el.appendChild(s1);
+function addLine(text) {
+const s = document.createElement('span');
+s.textContent = text;
+el.appendChild(s);
 el.appendChild(document.createElement('br'));
-const s2 = document.createElement('span');
-s2.textContent = line2;
-el.appendChild(s2);
+}
+addLine(line1);
+addLine(line2);
+if (line3) addLine(line3);
 }
 
 let lastClaimTime = 0;
 let lastRefreshTime = 0;
+let downlineRewardCache = null;
 
-async function loadDownlines() {
-if (!mainContract || isZeroContractAddress(CONFIG.MAIN_CONTRACT)) return;
-
+function saveDownlineRewardCache(cache) {
+downlineRewardCache = cache;
 try {
-const downlines = await vc().methods.downlines(account).call();
-
-if (downlines.length === 0) {
-renderDownlineListEmpty();
-return;
+localStorage.setItem('xyl_reward_cache', JSON.stringify(cache));
+} catch (e) { /* ignore */ }
 }
 
-const rows = [];
+function loadDownlineRewardCache() {
+if (downlineRewardCache && downlineRewardCache.account === account?.toLowerCase()) {
+return downlineRewardCache;
+}
+try {
+const raw = localStorage.getItem('xyl_reward_cache');
+if (!raw) return null;
+const c = JSON.parse(raw);
+if (!c || c.account !== account?.toLowerCase()) return null;
+downlineRewardCache = c;
+return c;
+} catch (e) {
+return null;
+}
+}
+
+/** 直推下级：优先链上 downlines()；旧版无此 view 时回退 ReferralBound 日志 */
+async function fetchDownlineAddresses() {
+const upline = account;
+if (!upline) return [];
+const contract = vc();
+if (!contract) return [];
+try {
+const list = await contract.methods.downlines(upline).call();
+if (Array.isArray(list)) return list;
+} catch (e) {
+console.warn('downlines() unavailable, fallback to ReferralBound logs', e);
+}
+const w3 = readWeb3 || web3;
+if (!w3 || !contract) return [];
+const latest = Number(await w3.eth.getBlockNumber());
+let from = Number(CONFIG.MAIN_DEPLOY_BLOCK || 0);
+const CHUNK = 400000;
+const seen = new Set();
+const out = [];
+while (from <= latest) {
+const to = Math.min(from + CHUNK - 1, latest);
+const events = await contract.getPastEvents('ReferralBound', {
+filter: { referrer: upline },
+fromBlock: from,
+toBlock: to
+});
+for (const ev of events) {
+const user = ev.returnValues && ev.returnValues.user;
+if (!user) continue;
+const key = user.toLowerCase();
+if (seen.has(key)) continue;
+seen.add(key);
+out.push(user);
+}
+from = to + 1;
+}
+return out;
+}
+
+/** 后台扫描直推下级可领档位，不渲染名单 */
+async function scanDownlineRewards() {
+const downlines = await fetchDownlineAddresses();
 const currentPhase = await vc().methods.currentPhase().call();
 const myHold = await vc().methods.getCurrentPhaseNetHold(account).call();
-
+const items = [];
 for (const downline of downlines) {
 const tierClaimed = await vc().methods.tierClaimed(account, downline, currentPhase).call();
 const downHold = await vc().methods.getCurrentPhaseNetHold(downline).call();
-
-let status = 'inactive';
-let statusText = t('notQualified');
-
 for (let tierId = 0; tierId < 3; tierId++) {
+if ((tierClaimed & (1 << tierId)) !== 0) continue;
 const tier = await vc().methods.phaseTiers(currentPhase, tierId).call();
 const upMin = tier.upMin != null ? tier.upMin : tier[0];
 const downMin = tier.downMin != null ? tier.downMin : tier[1];
-if ((tierClaimed & (1 << tierId)) === 0) {
 if (Number(downHold) >= Number(downMin) && Number(myHold) >= Number(upMin)) {
-status = 'claimable';
-statusText = t('claimable');
-break;
+items.push({ downline, tierId });
 }
 }
 }
-
-if (status === 'inactive') {
-if (tierClaimed === 7) {
-status = 'claimed';
-statusText = t('claimedAll');
-}
-}
-
-rows.push({ downline, status, statusText });
-}
-
-renderDownlineListRows(rows);
-} catch (e) {
-console.error('加载下级列表失败:', e);
-}
+return {
+account: account.toLowerCase(),
+phase: String(currentPhase),
+items,
+claimableCount: items.length,
+scannedAt: Date.now()
+};
 }
 
 async function refreshAllDownlines() {
@@ -3282,17 +3317,24 @@ return;
 }
 
 try {
-await loadDownlines();
+showToast(t('refreshScanning'), 'info');
+const scan = await scanDownlineRewards();
+saveDownlineRewardCache(scan);
 
 lastRefreshTime = Date.now();
 localStorage.setItem('xyl_last_refresh', lastRefreshTime.toString());
 
 const nextRefreshTime = new Date(lastRefreshTime + COOLDOWN_HOURS * 60 * 60 * 1000);
 const loc = (navigator.language || currentLang || 'zh-TW').replace('_', '-');
+const summary = scan.claimableCount > 0
+? tf('refreshCompleteClaimable', { count: scan.claimableCount })
+: t('refreshCompleteNone');
 setRefreshInfoLines(
 `${t('lastRefresh')}: ${new Date(lastRefreshTime).toLocaleString(loc)}`,
-`${t('nextRefresh')}: ${nextRefreshTime.toLocaleString(loc)}`
+`${t('nextRefresh')}: ${nextRefreshTime.toLocaleString(loc)}`,
+summary
 );
+showToast(summary, scan.claimableCount > 0 ? 'success' : 'info');
 
 const modal = document.getElementById('refreshModal');
 modal.style.display = 'flex';
@@ -3339,39 +3381,28 @@ claimLog.style.display = 'none';
 txPipelineBusy = true;
 try {
 try {
-const downlines = await vc().methods.downlines(account).call();
-
-if (downlines.length === 0) {
-addLog(t('noDownlineToClaim'), 'info');
+const cache = loadDownlineRewardCache();
+if (!cache || !cache.scannedAt) {
+addLog(t('claimNeedRefreshFirst'), 'error');
+return;
+}
+const items = cache.items || [];
+if (items.length === 0) {
+addLog(t('noClaimableReward'), 'info');
 return;
 }
 
-const currentPhase = await vc().methods.currentPhase().call();
-const myHold = await vc().methods.getCurrentPhaseNetHold(account).call();
-
 let successCount = 0;
 let failCount = 0;
-let claimableCount = 0;
 
 addLog(t('startClaiming'), 'info');
-addLog(tf('logPhaseLineFmt', { phase: currentPhase, count: downlines.length }), 'info');
+addLog(tf('logPhaseLineFmt', { phase: cache.phase, count: items.length }), 'info');
 
-for (const downline of downlines) {
-const tierClaimed = await vc().methods.tierClaimed(account, downline, currentPhase).call();
-const downHold = await vc().methods.getCurrentPhaseNetHold(downline).call();
-
-for (let tierId = 0; tierId < 3; tierId++) {
-if ((tierClaimed & (1 << tierId)) !== 0) continue;
-
-const tier = await vc().methods.phaseTiers(currentPhase, tierId).call();
-const upMin = tier.upMin != null ? tier.upMin : tier[0];
-const downMin = tier.downMin != null ? tier.downMin : tier[1];
-if (Number(downHold) < Number(downMin) || Number(myHold) < Number(upMin)) continue;
-
-claimableCount++;
+for (const item of items) {
+const downline = item.downline;
+const tierId = item.tierId;
 const addrShort = `${downline.slice(0,6)}...${downline.slice(-4)}`;
 addLog(tf('logTryClaimFmt', { addr: addrShort, tier: tierId + 1 }), 'info');
-
 try {
 await sendTxAndWait(mainContract.methods.claimReward(downline, tierId).send({ from: account }), { skipPendingToast: true });
 addLog(tf('logTierOkFmt', { tier: tierId + 1 }), 'success');
@@ -3385,20 +3416,13 @@ const errMsg = translateError(e);
 addLog(tf('logTierFailFmt', { tier: tierId + 1, msg: errMsg }), 'error');
 failCount++;
 }
-
 await new Promise(r => setTimeout(r, 500));
 }
-}
 
-if (claimableCount === 0) {
-addLog(t('noClaimableReward'), 'info');
-} else {
 addLog(tf('logDoneFmt', { ok: successCount, fail: failCount }), 'info');
 lastClaimTime = Date.now();
 localStorage.setItem('xyl_last_claim', lastClaimTime.toString());
-}
-
-loadDownlines();
+saveDownlineRewardCache({ account: account.toLowerCase(), phase: cache.phase, items: [], claimableCount: 0, scannedAt: cache.scannedAt });
 
 } catch (e) {
 addLog(tf('logErrorFmt', { msg: translateError(e) }), 'error');
