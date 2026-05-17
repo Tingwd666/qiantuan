@@ -13,11 +13,12 @@
   window.__XYL_ASSET_BASE__ = location.origin + dir;
 })();
 </script>
-<link rel="icon" href="favicon.ico" sizes="32x32">
-<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="shortcut icon" href="data:image/x-icon;base64,AAABAAEAICAQAAAAAADoAgAAFgAAACgAAAAgAAAAQAAAAAEABAAAAAAAgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAACAAAAAgIAAgAAAAIAAgACAgAAAgICAAMDAwAAAAP8AAP8AAAD//wD/AAAA/wD/AP//AAD///8Af////wAAAAAAAAAAD////3////AAAAAEREQAAAD///9///9wAAAEVV3VUAAAf///f///QAAARVRFXdUAAH///3///wAABEAAAAXdUAAP//9///8AAEQAAAAAXdQAD///f///AARAAAAAAAXVAA///3///wAEQAAAAAAAXQAP//9///8ARAAAAAAAAEVQD///f///AEQAAAAAAAAFUA///3///wBsQABEBABEVVAP//9///8ARsAExExAXd3QD///f///BAbEDEBMAF1VdQ///3///wQAZMwATABdAAQP//9///8EAEbEAEwAXQAED///f///BAAGYABHQF0ABA///3///wQAbmQAx3BdAAQP//9///8EAOZmBsSESABED///f///BEbkbmxgd1gARA///3///wRuYA7mQEh4AEQP//9///8E7kAEZAAHdQBAD///f///BGQAAAAAAAAAQA///3///wBmQAAAAAAABEAP//9///8ATmQAAAAAAAUAD///f///AE7kQAAAAABEAA///3///wBG7kAAAAAEQAAP//9///8ABG5kAAAARUAAD///f///YABG7mQAREQAAH///3///3AABEZmZmRAAAB///9////wAABERERAAAAA////f////wAAAAAAAAAAD////3d3d3dwAAAAAAAAAHd3d3eAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAA/////w==">
+<link rel="icon" type="image/x-icon" href="favicon.ico" sizes="32x32">
 <link rel="icon" href="favicon.png" type="image/png" sizes="32x32">
 <link rel="icon" href="icon-192.png" type="image/png" sizes="192x192">
 <link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="site.webmanifest">
 <meta name="theme-color" content="#667eea">
 <meta name="application-name" content="小翼龙 XYL">
@@ -29,7 +30,7 @@
 (function () {
   var base = window.__XYL_ASSET_BASE__ || (location.origin + '/');
   function abs(h) {
-    if (!h || /^https?:\/\//i.test(h)) return h;
+    if (!h || /^https?:\/\//i.test(h) || /^data:/i.test(h)) return h;
     return base + h.replace(/^\.\//, '');
   }
   document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"], link[rel="manifest"]').forEach(function (el) {
